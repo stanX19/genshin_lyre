@@ -1,5 +1,6 @@
 from funcs import *
 from utils import *
+from classes import *
 try:
     from .play_song import play_song
 except ImportError:
@@ -16,7 +17,6 @@ except ImportError:
 def user_input_control(enter=''):
     """execute various function via cmd, mainly playing songs in Songs.songs
     does not return any value"""
-    global Settings
     loop = not enter  # no loop if specific command(enter) is given
     while loop:
         no_result = False
@@ -74,7 +74,8 @@ def user_input_control(enter=''):
                     for var in get_settings_dict():
                         print(f"    | {var}")
                     if input("are you sure? (Y/n): ").lower() in ["yes", "y"]:
-                        Settings = type("Settings", (Settings,), Settings.backup)
+                        for key, val in Settings.backup.items():
+                            setattr(Settings, key, val)
                         save_settings()
                         print("  All settings resetted")
                 else:
@@ -281,54 +282,8 @@ def user_input_control(enter=''):
                 no_result = False
 
             elif 'set' in enter.split():
-                enter = enter.replace("set",'').strip()
+                set_settings(enter)
                 no_result = False
-                i = 0
-                Settings_dict = get_settings_dict()
-                while i < 1:
-                    if 'coordinate' in enter:
-                        Settings.genshin_app_coordinate = return_mouse_coordinate("genshin_app position")
-                        save_settings()
-                        print(f"  genshin_app position is set to {Settings.genshin_app_coordinate}\n")
-                        break
-                    elif enter in Settings_dict:
-                        ori_val = Settings_dict[enter]
-                        value_class = type(ori_val)
-                        if value_class != bool:
-                            print(f"  Current {enter} is set to \"{ori_val}\"")
-                            new_value = input(f"new value for {enter}?({value_class.__name__}): ")
-                            try:
-                                new_value = value_class(new_value)
-                                print(f"  {enter} set to {new_value}")
-                            except ValueError:
-                                print("invalid value")
-                                break
-                        else:
-                            print(f"  Current {enter} is turned {'on' if ori_val else 'off'}")
-                            toggle_value = input(f"turn {enter} {'off' if ori_val else 'on'}?(Y/n): ").lower() == "y"
-                            new_value = (toggle_value + ori_val) == 1  # xor, plot it yourself
-                            if toggle_value:
-                                print(f"  {enter} is turned {'on' if new_value else 'off'}")
-                            else:
-                                print("  Cancelled\n")
-                                break
-                        #       object    attr   value
-                        setattr(Settings, enter, new_value)
-                        save_settings()
-                        break
-                    else:
-                        print("enter 'q' to quit this mode")
-                        print_list(list(Settings_dict), False, ")", "  ", "")
-                        command = input("Which users settings do you want to edit?: ").lower()
-                        if command.isnumeric():
-                            try:
-                                enter = list(Settings_dict)[int(command) - 1]
-                            except ValueError as exc:
-                                print(f"ERROR: Please input whole numbers")
-                            i -= 1
-                        else:
-                            enter = command
-                    i += 1
 
             elif "rename" in enter:
                 if rename_song(enter) != 0:

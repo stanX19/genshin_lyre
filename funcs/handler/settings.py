@@ -4,7 +4,6 @@ except ImportError:
     from classes import *
 
 def get_settings_dict():
-    global Settings
     Settings_list = dict(Settings.__dict__.items())
     if 'backup' in Settings_list:
         del Settings_list["backup"]
@@ -13,14 +12,14 @@ def get_settings_dict():
 
 def read_settings():
     """read settings.txt using json, will create new settings.txt if OSError"""
-    global Settings
     Settings.backup = get_settings_dict()
     Excluded_backup = Settings.backup
     try:
         with open(Paths.settings_path, encoding="utf-8") as f:
             user_settings = json.load(f)
         if list(Excluded_backup) == list(user_settings):
-            Settings = type("Settings", (Settings,), user_settings)
+            for key in Excluded_backup:
+                setattr(Settings, key, user_settings[key])
             return 1
         else:
             save_settings()

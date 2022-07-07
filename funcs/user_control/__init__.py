@@ -5,3 +5,4 @@ from .delete_score import *
 from .new_midi import *
 from .print_stats import *
 from .rename_song import *
+from .set_settings import *

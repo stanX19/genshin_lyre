@@ -163,7 +163,7 @@ class Midi:
                     # if prev delay is lower than min threshold and len(score_list) is not 1
                     if Settings.midi_kill_delay and score_list[-1] < 0.11 \
                             and score_list[0] is not score_list[-1]:
-                        extra = "." * int(score_list[-1] / 0.001414)
+                        extra = "." * int(score_list[-1] / 0.0007)
                         score_list.pop(-1)
                         score_list[-1] += extra + stated_note
                     else:

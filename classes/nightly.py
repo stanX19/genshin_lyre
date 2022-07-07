@@ -37,7 +37,7 @@ class Nightly():
                 temp_store = "".join(set(temp_store))
                 if Settings.midi_kill_delay and self.score_list[-1] < 0.11 \
                         and self.score_list[0] is not self.score_list[-1]:
-                    extra = "." * int(self.score_list[-1] / 0.001414)
+                    extra = "." * int(self.score_list[-1] / 0.007)
                     self.score_list.pop(-1)
                     self.score_list[-1] += extra + temp_store
                 else:

@@ -35,7 +35,7 @@ from send2trash import send2trash
 def run():
     # with this moving mouse to corner wont activate failsafe
     # but you will need be very careful with pyautogui
-    pyautogui.FAILSAFE = False
+    #pyautogui.FAILSAFE = False
     # reset variables
     UserVaria.song_loop = False
     PlayVaria.speed = 1

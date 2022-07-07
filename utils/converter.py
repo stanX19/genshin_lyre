@@ -4,7 +4,7 @@ import json
 from .common import first_float
 
 def score_list_to_score(score_list):
-    all_keys = "ZXCVBNMASDFGHJQWERTYU"
+    all_keys = "ZXCVBNMASDFGHJQWERTYUzxcvbnmasdfghjqwertyu"
     all_time = [i for i in score_list if type(i) == float]
     try:
         average_time = statistics.mode(all_time) #mode

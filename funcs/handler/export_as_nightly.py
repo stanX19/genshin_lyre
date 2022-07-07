@@ -37,7 +37,7 @@ def clean_exported():
     if not Paths.export_paths:
         print("    no exported files to be cleaned")
         return
-    for path in Paths.export_paths:
+    for path in set(Paths.export_paths):
         send2trash(path)
         print(f"    deleted: {path}")
     Paths.export_paths = []
