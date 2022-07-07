@@ -1,7 +1,12 @@
-from classes import *
-from utils import print_cmd_color
-from utils.print_functions import print_rows as print_list
-from order import read_order
+try:
+    from ...classes import *
+    from ...utils import print_cmd_color
+    from ...utils.print_functions import print_rows as print_list
+except ImportError:
+    from classes import *
+    from utils import print_cmd_color
+    from utils.print_functions import print_rows as print_list
+from rdwr_order import read_order
 import pathlib
 import re
 

@@ -1,5 +1,13 @@
-from classes import *
-from handler import *
+try:
+    from ...classes import *
+    from ..helper import get_song_index
+    from ...utils import first_int
+    from ..handler import read_order, write_order
+except ImportError:
+    from classes import *
+    from handler import *
+    from utils import first_int
+    from rdwr_order import read_order, write_order
 
 def edit_order(command, song_name=""):
     if Paths.order_path is None:

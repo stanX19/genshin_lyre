@@ -1,9 +1,15 @@
 import os
 import shutil
-from handler import print_song_list
-from test_session import test_session
-from classes import *
-from utils import *
+try:
+    from ..handler import print_song_list
+    from ..test_session import test_session
+    from ...classes import *
+    from ...utils import *
+except ImportError:
+    from handler import print_song_list
+    from test_session import test_session
+    from classes import *
+    from utils import *
 
 
 def new_nightly(nightly_path=""):

@@ -1,4 +1,7 @@
-from classes import *
+try:
+    from ...classes import *
+except ImportError:
+    from classes import *
 
 def get_settings_dict():
     global Settings

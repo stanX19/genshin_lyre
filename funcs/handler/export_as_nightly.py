@@ -1,5 +1,9 @@
-from classes import *
-from utils import *
+try:
+    from ...classes import *
+    from ...utils import *
+except ImportError:
+    from classes import *
+    from utils import *
 from send2trash import send2trash
 
 def export_as_nightly(song=None,score='',name=''):
