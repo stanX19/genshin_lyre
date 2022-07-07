@@ -1,0 +1,35 @@
+(beat0.125)
+
+(vmd) e e e e w e y e w w  
+(nsg) w w w w q w t w q j q  
+h j (qbf) q q q q  
+h j (qvmd) q q q j q  
+h j (qcns) q q q q t q (wxba) (cns) 
+(nmd) e e e e w e y e w w 
+(cns) w w w w q w t (wz) (qn) (js) (qg) 
+h j (qxnd) q q q (qsf) 
+h j (qcsg) q q q (ja) q 
+h j (qvsh) q q q (qf) t r e (wbf) 
+(emd) (rf) 
+(twv) (twa) (tw) (twc)
+(rm) e w (wjn) (ed) (qg)
+a (sfb) a (bad)
+e r (twv) (twa) (tw) (tw) (twc) (rqm)
+e w (wjn) (eqc)
+q w (ex) n h (qd) f
+(adb) (fv) (sn)
+h j (qn) (qd) w q (jb) c
+d g (hv) (ha) g f (gc) a
+g (gax) f f d (fsv)
+a f (gbas) g h (gsb)
+h j (qn) (qd) w  q (jb) c
+d g (hv) (ha) g f (gc) a
+g (gx) (fb) f d (fx) v
+h j (qz) (jv) j h (jz) c
+j q w (ev) a c a
+q w (exh) a e q  w (wjb) s
+(gb) (qa) (jm) (qz)
+
+
+
+old_music_score

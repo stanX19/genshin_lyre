@@ -1,0 +1,31 @@
+(beat0.15)
+
+H Q (EV)   (BM)
+J Q (WN)  5Q
+(TC) J (HV)  E
+(BM)  W  (GN) 
+
+H Q (EV)   (BM)
+J Q (WN)  5Q
+(TC) W (VA) Q (BM) H W (NA) Q C N
+
+H E (EV)  5E J (BM)5 H Q (NA)5D
+(HB) E (EV)  E U (BM)5 Q E (NA)
+
+(HC) E (EV)  E J (BM)5 Q G (NA) 
+G5D1G5(VN)8(BM)5W5Q1W5(NS) Q H (NA)
+
+E8W8(WV) Q8(QN) T8(QB) 2(JM) Q5N5A5Q5A5J5A
+(EB)8W8(WV) Q8(GN)7E8(WB) 2(EM) Q5N5A5J5A5Q
+(EB)8W8(WV) Q8(QN) T7(TB)7T (WM)8Q5N5D5J5Q
+H8Q8(WV) 3W Q (WB)8E W8W8N8Q  
+
+Q J5DH(VN)   (BM) 2Q J5DA(NA) 
+Q (JB)5DH(VN)  HJ(BM)  WQ(NA) 
+
+Q J5DH2V5B  Q J5DAN  
+Q J5QW2V EEB5QJN
+
+
+
+old_music_score

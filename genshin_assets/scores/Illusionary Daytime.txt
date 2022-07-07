@@ -1,0 +1,30 @@
+(beat0.05)
+
+D   G   (SV)   S   A
+  M G (SMB)   S   A
+  M D (ANC)   A   M   N   (CZ) C A A M M
+B G (SZ)  VS   A
+  M G (SX)  B S   A
+  M D (ANC) C A   M   N   (CZ) C A A
+
+D  G  D (DVZ) S V
+   (DZ)  G  D (DBX) S B
+   D  G  D (DNC) D C N C C C A A
+   D  G  D (DVZ) SZV
+   (DZ)  G  D (DBX) SXB   D  (GB)  S  (SNC)  D C  B C
+   (DANC)   D   G   H G H E Z V N
+H (HBX) G H W X B
+Q (JZ) C G C D   S   (ANC)   M   N   B  
+(HV) G H E Z V N H
+(HBX) G H W X B Q   (JC)   N   A   H   H   N   C C A A 
+(DC)   (GB)   (SV)   S   A
+  M G (SMB)   S   A
+  M D (ANC)   A   M   N   (CZ) C A A M M
+B G (SZ)  VS   A
+  M G (SX)  B S   A
+  M D (ANC) C A   M   N   (CZ) C A A
+ M M  B B   (HC)
+
+
+
+old_music_score

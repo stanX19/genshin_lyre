@@ -1,0 +1,398 @@
+from funcs import *
+from utils import *
+try:
+    from .play_song import play_song
+except ImportError:
+    from play_song import play_song
+
+try:
+    import genshin_automation
+except ImportError:
+    class genshin_automation():
+        @classmethod
+        def macros(cls):
+            print("genshin_automation.py is not found")
+
+def user_input_control(enter=''):
+    """execute various function via cmd, mainly playing songs in Songs.songs
+    does not return any value"""
+    global Settings
+    loop = not enter  # no loop if specific command(enter) is given
+    while loop:
+        no_result = False
+        if loop:  # always true if no default enter is given
+            enter = input("song name: ").lower()
+        if enter != "":
+            if enter.isnumeric():
+                if int(enter) <= len(Songs.songs):
+                    play_song(int(enter) - 1)
+                    print("{}".format(
+                        'note: Speed is still set at {}x, enter new speed or enter \'reset\' to reset all variables\n'.format(
+                            int(PlayVaria.speed)) if PlayVaria.speed != 1 else ''), end="")
+                    continue  # you don't want the song to play twice, theres another player down there
+
+            no = re.findall("[-+]?[.]?[\d]+(?:,\d\d\d)*[.]?\d*(?:[eE][-+]?\d+)?", enter)
+
+            # convert names to index
+            if "speed" not in enter:
+                for i, e in enumerate(list(Songs.songs.keys())):
+                    if e in enter:
+                        enter = enter.replace(e, str(i + 1))
+                        no = [str(i + 1)]
+                        break
+
+            # commands that dont need to deal with number, (can be used together with song index to play song)
+            if "list" in enter or "ls" in enter:
+                corresponding_path = {
+                    "test":Paths.test_path,
+                    "mid":Paths.mid_path,
+                    "txt":Paths.test_path,
+                    "scores": Paths.test_path,
+                    "nightly":Paths.nightly_path,
+                }
+                if "all" in enter:
+                    print("\n".join(list(Songs.songs)))
+                    continue
+                for keyword,file_path in corresponding_path.items():
+                    if keyword in enter:
+                        os.startfile(file_path)
+                        file_ext = Paths.file_type.get(file_path,"txt")
+                        all_songs_in_file = pathlib.Path(file_path).glob(f'*.{file_ext}')
+                        for song_path in all_songs_in_file:
+                            song_name = str(song_path).replace(f".{file_ext}", "").replace(file_path + "\\", "")
+                            print(song_name)
+                        print()
+                        break
+                else:
+                    os.system('cls')
+                    refresh_song_list()
+                continue
+
+            elif "reset" in enter:
+                if "all" in enter:
+                    print("  Resetting all users settings, inculding:")
+                    for var in get_settings_dict():
+                        print(f"    | {var}")
+                    if input("are you sure? (Y/n): ").lower() in ["yes", "y"]:
+                        Settings = type("Settings", (Settings,), Settings.backup)
+                        save_settings()
+                        print("  All settings resetted")
+                else:
+                    UserVaria.song_loop = False
+                    PlayVaria.speed = 1
+                    print("song loop turned off, Playback speed reset to 1")
+            elif "help" in enter:
+                if os.path.exists(Paths.help_path):
+                    try:
+                        with open(Paths.help_path, "r", encoding="utf-8") as f:
+                            print(r"{}".format(f.read()))
+                    except FileNotFoundError as exc:
+                        print(f"An error occured while reading help.txt: {exc}")
+                else:
+                    print("Help.txt is not availabe")
+                no_result = False
+            elif 'record' in enter:
+                with open('record.py', "r") as record:
+                    exec(str(record))
+            elif 'nightly' in enter:
+                os.startfile(Paths.nightly_website)
+            elif 'cls' == enter:
+                os.system('cls')
+            elif 'bright' in enter:
+                os.system('color f0')
+            elif 'dark' in enter:
+                os.system('color 07')
+            elif "clean" in enter:
+                clean_exported()
+            elif "sort" in enter or "by" in enter.split():
+                if "date" in enter or "time" in enter:
+                    if Settings.follow_order:
+                        print("  Song list will now be sorted by date created")
+                        Settings.follow_order = False
+                        refresh_song_list()
+                    else:
+                        print("  Song list is already sorted by date created")
+                elif "order" in enter:
+                    if not Settings.follow_order:
+                        print("  Song list will now follow [order]")
+                        Settings.follow_order = True
+                else:
+                    print("  Song list is sorted by{}".format("[order]" if Settings.follow_order else "date created"))
+                save_settings()
+
+            # notification toggling
+            elif "notif" == enter or 'notification' in enter or (
+                    ("notif" in enter.split()) and ("on" in enter or "off" in enter)):
+                if "on" in enter.split(" ") or enter.find("true") >= 0:
+                    print("Turned notification on") if not Settings.notification else print(
+                        "Notification is already activated")
+                    Settings.notification = True
+                elif "off" in enter or "false" in enter:
+                    print("Turned notification off") if Settings.notification else print(
+                        "Notification is already deactivated")
+                    Settings.notification = False
+
+                else:
+                    print(
+                        f"currently turned {'on' if Settings.notification else 'off'}, include 'on' or 'off' to toggle notification")
+                save_settings()
+
+            elif "auto" == enter:
+                prompt_control_function(genshin_automation.macros())
+            # song_loop toggling
+            elif "loop" in enter:
+
+                if enter.find("off") >= 0 or enter.find("false") >= 0 or enter.find("no") >= 0 or enter.find(
+                        "loop'") >= 0:
+                    print("Turned song loop off, songs now wont loop automatically") if UserVaria.song_loop else print(
+                        "song loop is already turned off")
+                    UserVaria.song_loop = False
+                else:
+                    print(
+                        "Turned song loop on, songs will now play continually without toggling") if not UserVaria.song_loop else print(
+                        "song loop is already turned on")
+                    UserVaria.song_loop = True
+
+            elif enter.lower() == 'i':
+                return False
+            else:
+                no_result = True
+
+            # commands that need to deal with number
+            if 'order' in enter:
+                result = edit_order(enter)
+                if result == 0:
+                    print("exited editing\n")
+                else:
+                    print()
+                    refresh_song_list()
+                no_result = False
+
+            elif "export" in enter:
+                if no:
+                    no = int(no[0]) - 1
+                else:
+                    index = input("Song index of song?: ")
+                    no = get_song_index(index)
+                if no is None:
+                    continue
+                try:
+                    selected_song = list(Songs.songs.values())[no]
+                    export_as_nightly(selected_song)
+                except IndexError:
+                    print("Invalid index")
+                continue
+
+            elif 'stats' in enter or 'info' in enter or 'data' in enter:
+                no_result = False
+                if no:
+                    no = int(no[0])-1
+                else:
+                    index = input("Song index of song?: ")
+                    no = get_song_index(index)
+                if no is None:
+                    continue
+                try:
+                    print_stats(no)
+                except IndexError:
+                    print("Invalid index")
+                continue
+
+            elif "txt" in enter or "key" in enter or "score" in enter:
+                no_result = False
+                if no == []:
+                    no = get_song_index(enter)  # returns int or None ONLY
+                    if no is not None:
+                        no = [str(no + 1)]
+                    else:
+                        temp = input("song name or song index? ")
+                        no = get_song_index(temp)  # returns int or None ONLY
+                        if no is None:
+                            no_result = True
+                            print("invalid song name or index :(\n")
+                        else:
+                            no = [str(no + 1)]
+
+                if no != [] and not no_result:  # no_result is used here as a local variable
+                    no = int(no[0])
+                    if no <= len(Songs.songs):
+                        selected_song = list(Songs.songs.values())[no - 1]
+                        if isinstance(selected_song,old_music_score):
+                            if type(selected_song) == old_music_score:
+                                keys = [i for keys in selected_song.keys for i in [keys,"-"]]
+                            else:
+                                keys = selected_song.keys
+                            raw_keys = score_list_to_score(key_list_to_score_list(keys))
+                        else:
+                            raw_keys = selected_song.score
+                        if "raw" in enter:
+                            pass
+                        else:
+                            spaced_key = "\n".join(
+                                [i.replace("-", " ").strip() for i in raw_keys.splitlines()])
+                            if "space" in enter:
+                                raw_keys = spaced_key
+                            else:
+                                stripped_key = " ".join([i for i in spaced_key.split(" ") if i and "BEAT" not in i])
+                                raw_keys = stripped_key
+                                print("you can try: [space key] or [raw key]")
+
+                        print(f"\n>>>{list(Songs.songs.keys())[no - 1].capitalize()}<<<")
+                        print(raw_keys)
+
+                        if 'txt' in enter:
+                            if os.path.exists(f"{Paths.score_path}\\{list(Songs.songs.keys())[no - 1]}.txt"):
+                                os.startfile(f"{Paths.score_path}\\{list(Songs.songs.keys())[no - 1]}.txt")
+                            else:
+                                if input(f"'{list(Songs.songs.keys())[no - 1]}' is a midi file, start anyways? (Y/n): ").lower() in ["yes", 'y']:
+                                    os.startfile(f"{Paths.mid_path}\\{list(Songs.songs.keys())[no - 1]}.mid")
+                    else:
+                        print(f"""    song index is out of range, maximum index is {len(Songs.songs)}""")
+
+                no_result = False
+            elif 'midi' in enter.split():
+                if 'new' in enter:
+                    new_midi()
+                else:
+                    os.startfile(Paths.mid_path)
+                no_result = False
+
+            elif "test" in enter or 'new' in enter or "edit" in enter:
+                NEW = True  # if not 'test' in enter / if 'new' in enter or 'edit' in enter
+
+                if no != [] and int(no[0]) <= len(Songs.songs.keys()) and "edit" in enter:
+                    selected_song = list(Songs.songs.values())[int(no[0]) - 1]
+                    NAME = no[0]
+                    TEST_SCORE = selected_song.score
+                    if type(selected_song) == old_music_score:
+                        TEST_SCORE = "-".join(selected_song.raw_key_list)
+
+                    print("switched to test session, any changes here wont affect the original song")
+                    print(
+                        "if you want to access this test score again, just enter 'test' followed by its file number to open it\n")
+                else:
+                    if "test" in enter:
+                        NAME = enter.replace("test", "").strip()
+                        NEW = False
+                    else:
+                        NAME = ""
+                    TEST_SCORE = ""
+                test_session(NAME, TEST_SCORE, NEW)
+                no_result = False
+
+            elif 'set' in enter.split():
+                enter = enter.replace("set",'').strip()
+                no_result = False
+                i = 0
+                Settings_dict = get_settings_dict()
+                while i < 1:
+                    if 'coordinate' in enter:
+                        Settings.genshin_app_coordinate = return_mouse_coordinate("genshin_app position")
+                        save_settings()
+                        print(f"  genshin_app position is set to {Settings.genshin_app_coordinate}\n")
+                        break
+                    elif enter in Settings_dict:
+                        ori_val = Settings_dict[enter]
+                        value_class = type(ori_val)
+                        if value_class != bool:
+                            print(f"  Current {enter} is set to \"{ori_val}\"")
+                            new_value = input(f"new value for {enter}?({value_class.__name__}): ")
+                            try:
+                                new_value = value_class(new_value)
+                                print(f"  {enter} set to {new_value}")
+                            except ValueError:
+                                print("invalid value")
+                                break
+                        else:
+                            print(f"  Current {enter} is turned {'on' if ori_val else 'off'}")
+                            toggle_value = input(f"turn {enter} {'off' if ori_val else 'on'}?(Y/n): ").lower() == "y"
+                            new_value = (toggle_value + ori_val) == 1  # xor, plot it yourself
+                            if toggle_value:
+                                print(f"  {enter} is turned {'on' if new_value else 'off'}")
+                            else:
+                                print("  Cancelled\n")
+                                break
+                        #       object    attr   value
+                        setattr(Settings, enter, new_value)
+                        save_settings()
+                        break
+                    else:
+                        print("enter 'q' to quit this mode")
+                        print_list(list(Settings_dict), False, ")", "  ", "")
+                        command = input("Which users settings do you want to edit?: ").lower()
+                        if command.isnumeric():
+                            try:
+                                enter = list(Settings_dict)[int(command) - 1]
+                            except ValueError as exc:
+                                print(f"ERROR: Please input whole numbers")
+                            i -= 1
+                        else:
+                            enter = command
+                    i += 1
+
+            elif "rename" in enter:
+                if rename_song(enter) != 0:
+                    refresh_song_list()
+                no_result = False
+
+            # Playback speed
+            elif "speed" in enter:
+                if no:  # != []:
+                    gained_integer = min(float(no[0]),10.0)
+                    PlayVaria.speed = gained_integer
+                    print(f"Playback speed set to {gained_integer}x")
+                else:
+                    print(f"speed is currently set to {PlayVaria.speed}x,\
+                     include a amplifier e.g. '1.5x' for 1.5 times faster to change the speed")
+                no_result = False
+
+            # score deleter
+            elif "delete" in enter or "rm" in enter.split():
+                # no = re.findall("[-+]?[.]?[\d]+(?:,\d\d\d)*[.]?\d*(?:[eE][-+]?\d+)?", enter)
+                if no != []:
+                    if float(no[0]) <= len(Songs.songs) and float(no[0]).is_integer():
+                        target = list(Songs.songs.keys())[int(no[0]) - 1]
+                        delete_score(target)
+                    else:
+                        print("Invalid integer")
+                else:
+                    target = input("Score name or integer: ")
+                    no = re.findall("[-+]?[.]?[\d]+(?:,\d\d\d)*[.]?\d*(?:[eE][-+]?\d+)?", target)
+                    if target in list(Songs.songs.keys()):
+                        delete_score(target)
+                        refresh_song_list()
+                    elif no != []:
+                        if float(no[0]) <= len(Songs.songs) and float(no[0]).is_integer():
+                            target = list(Songs.songs.keys())[int(no[0]) - 1]
+                            delete_score(target)
+                    else:
+                        print("invalid input")
+                no_result = False
+
+            elif no != [] and "." not in no[0] and int(no[0]) <= len(Songs.songs):
+                enter = list(Songs.songs.keys())[
+                    int(no[0]) - 1]
+
+            elif not enter in Songs.songs and len(enter) >= 2:  # if all above 'elif' cannot match song name
+                # change short form to song name
+                words_name = {}
+                words = enter
+                for names in list(Songs.songs.keys()):
+                    if words in names.split(" "):
+                        words_name[names.find(words)] = names
+                    elif words in names:
+                        words_name[names.find(words) + 1] = names
+
+                if words_name != {}:
+                    enter = words_name[min(words_name.keys())]
+
+            if enter in Songs.songs:
+                PlayVaria.song_index = 0
+                play_song(list(Songs.songs.keys()).index(enter))  # output (index of song)
+                print("{}".format(
+                    'note: Playback speed is still turned on, set at {}x, enter new speed or enter \'reset\' to reset all variables\n'.format(
+                        int(PlayVaria.speed)) if PlayVaria.speed != 1 else ''), end="")
+
+            elif no_result:
+                no_result = False
+                print("key not found, enter 'i' to exit")

@@ -1,0 +1,19 @@
+(beat0.075)
+
+(EZ)    E8W8Q3 (HV)   Q   W   (GC)   C
+  G   (EX)    E8W8Q3 (HB)   Q   W   (GZ)   Q
+
+    G   (EZ) B D E8W8Q3 (HV) A Q   W   (GC) A D5  C A S
+   (EX) A D E8W8Q3 (HB) S Q  W 7(QZ)  B8A7S6D5G6Q7W7E
+
+(TC) M A G T  (YC) S G
+   Q  (EV) A H  W Q
+(WV)  A  S
+
+(EB) A D E8W8Q3 (HB) S Q  W
+(EV) A S E8W8Q3 (HB) S Q  W
+ (QZ)  B  A  S  D  G  Q
+
+
+
+old_music_score
