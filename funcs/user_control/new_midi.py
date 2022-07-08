@@ -2,16 +2,16 @@ import os
 import shutil
 try:
     from ..handler import print_song_list
-    from ..test_session import test_session
+    import test_session
     from ...classes import *
     from ...utils import *
 except ImportError:
     from handler import print_song_list
-    from test_session import test_session
+    import test_session
     from classes import *
     from utils import *
 
-
+test_session = test_session.test_session
 def new_nightly(nightly_path=""):
     if not nightly_path:
         nightly_path = fileopenbox().strip().lower()
@@ -97,7 +97,7 @@ def new_midi():
         else:
             print("  Cancelled saving")
             print("Edit and save as test score instead? ",end='')
-            if input("(Y/n): ").lower() in ["n", "no"]:
+            if input("(Y/n): ").lower() in ["y", "yes"]:
                 return test_session(score=new_midi.raw_keys, new=True)
             print("  Midi file will be temporarily added to the song list")
         new_midi.name = name

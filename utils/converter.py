@@ -1,7 +1,10 @@
 import statistics
 import math
 import json
-from .common import first_float
+try:
+    from .common import first_float
+except ImportError:
+    from common import first_float
 
 def score_list_to_score(score_list):
     all_keys = "ZXCVBNMASDFGHJQWERTYUzxcvbnmasdfghjqwertyu"

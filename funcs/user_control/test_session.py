@@ -1,6 +1,11 @@
-from classes import *
-import test11
-from handler import read_order, print_song_list, refresh_song_list
+try:
+    from ...classes import *
+    import test11
+    from ...handler import read_order, print_song_list, refresh_song_list, edit_order
+except ImportError:
+    from classes import *
+    import test11
+    from handler import read_order, print_song_list, refresh_song_list, edit_order
 from send2trash import send2trash
 
 

@@ -1,10 +1,13 @@
 from mido import MidiFile
 from functools import cached_property
 from data import *
-from utils import *
 import keyboard
 import pyautogui
 import time
+try:
+    from ...utils import *
+except ImportError:
+    from utils import *
 
 
 class Midi:
