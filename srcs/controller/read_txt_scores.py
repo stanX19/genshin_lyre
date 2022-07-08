@@ -6,10 +6,9 @@ except ImportError:
     from classes import *
     from utils import print_cmd_color
     from utils.print_functions import print_rows as print_list
-from rdwr_order import read_order
+import order
 import pathlib
 import re
-
 
 def read_txt_scores():
     """reads through midi folder, txt folder, nightly folder
@@ -18,7 +17,7 @@ def read_txt_scores():
     # local variable to be used
     all_types = {}
     missing_txt = []
-    Songs.songs_order = read_order()
+    Songs.songs_order = order.read()
     # loop through all file storing the scores
     # end is the file format stored in each file, set at Paths.file_type
     for file_dir, ext in Paths.file_type.items():

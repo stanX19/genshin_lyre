@@ -1,12 +1,12 @@
 try:
     from ...utils import *
     from ...classes import *
-    from ..handler import order, print_song_list
+    from ..controller import order, print_song_list
     from send2trash import send2trash
 except ImportError:
     from utils import *
     from classes import *
-    from handler import order, print_song_list
+    from controller import order, print_song_list
     from send2trash import send2trash
 
 def rename_song(command):

@@ -2,12 +2,12 @@ try:
     from ...utils import return_mouse_coordinate
     from ...utils import print_rows as print_list
     from ...classes import Settings
-    from ..handler import save_settings, get_settings_dict
+    from ..controller import save_settings, get_settings_dict
 except ImportError:
     from utils import return_mouse_coordinate
     from utils import print_rows as print_list
     from classes import Settings
-    from handler import save_settings, get_settings_dict
+    from controller import save_settings, get_settings_dict
 
 def set_settings(enter:str):
     enter = enter.replace("set",'').strip()

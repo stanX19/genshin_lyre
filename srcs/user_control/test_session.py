@@ -1,11 +1,11 @@
 try:
     from ...classes import *
     import test11
-    from ...handler import order, print_song_list, refresh_song_list
+    from ...controller import order, print_song_list, refresh_song_list
 except ImportError:
     from classes import *
     import test11
-    from handler import order, print_song_list, refresh_song_list
+    from controller import order, print_song_list, refresh_song_list
 from send2trash import send2trash
 
 

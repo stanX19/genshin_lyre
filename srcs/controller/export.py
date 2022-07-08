@@ -33,7 +33,7 @@ def export_as_nightly(song=None,score='',name=''):
     except Exception as exc:
         print(f"Error: {exc}")
 
-def clean_exported():
+def clean():
     if not Paths.export_paths:
         print("    no exported files to be cleaned")
         return

@@ -1,4 +1,4 @@
-from funcs import *
+from srcs import *
 from utils import *
 from classes import *
 try:
@@ -103,7 +103,7 @@ def user_input_control(enter=''):
             elif 'dark' in enter:
                 os.system('color 07')
             elif "clean" in enter:
-                clean_exported()
+                export.clean()
             elif "sort" in enter or "by" in enter.split():
                 if "date" in enter or "time" in enter:
                     if Settings.follow_order:
@@ -178,7 +178,7 @@ def user_input_control(enter=''):
                     continue
                 try:
                     selected_song = list(Songs.songs.values())[no]
-                    export_as_nightly(selected_song)
+                    export.export_as_nightly(selected_song)
                 except IndexError:
                     print("Invalid index")
                 continue

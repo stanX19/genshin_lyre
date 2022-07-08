@@ -1,9 +1,9 @@
 try:
     from ...classes import Paths, Songs
-    from ..handler import print_song_list, order
+    from ..controller import print_song_list, order
 except ImportError:
     from classes import Paths, Songs
-    from handler import print_song_list, order
+    from controller import print_song_list, order
 from send2trash import send2trash
 import os
 

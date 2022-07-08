@@ -1,12 +1,12 @@
 import os
 import shutil
 try:
-    from ..handler import print_song_list
+    from ..controller import print_song_list
     import test_session
     from ...classes import *
     from ...utils import *
 except ImportError:
-    from handler import print_song_list
+    from controller import print_song_list
     import test_session
     from classes import *
     from utils import *
