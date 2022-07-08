@@ -5,7 +5,6 @@ try:
     from .play_song import play_song
 except ImportError:
     from play_song import play_song
-
 try:
     import genshin_automation
 except ImportError:
@@ -161,7 +160,7 @@ def user_input_control(enter=''):
 
             # commands that need to deal with number
             if 'order' in enter:
-                result = edit_order(enter)
+                result = order.edit(enter)
                 if result == 0:
                     print("exited editing\n")
                 else:

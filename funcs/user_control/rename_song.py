@@ -1,12 +1,12 @@
 try:
     from ...utils import *
     from ...classes import *
-    from ..handler import write_order, print_song_list
+    from ..handler import order, print_song_list
     from send2trash import send2trash
 except ImportError:
     from utils import *
     from classes import *
-    from handler import write_order, print_song_list
+    from handler import order, print_song_list
     from send2trash import send2trash
 
 def rename_song(command):
@@ -75,7 +75,7 @@ def rename_song(command):
             if original_name in Songs.songs_order:
                 index = Songs.songs_order.index(original_name)
                 Songs.songs_order[index] = new_name
-                write_order(Songs.songs_order)
+                order.write(Songs.songs_order)
 
             print(f"Success: '{original_name}' --> '{new_name}'\n")
             return 1

@@ -1,15 +1,51 @@
 try:
     from ...classes import *
     from ..helper import get_song_index
-    from ...utils import first_int
-    from ..handler import read_order, write_order
+    from ...utils import first_int, reduceLineBreak
 except ImportError:
     from classes import *
-    from handler import *
-    from utils import first_int
-    from rdwr_order import read_order, write_order
+    from helper import get_song_index
+    from utils import first_int, reduceLineBreak
 
-def edit_order(command, song_name=""):
+def read():
+    """return ordered text (list), if none None"""
+    if Paths.order_path is not None:
+        with open(Paths.order_path, "r") as f:
+            # everything done is to prevent repeated element and kill excessive line break from scores_order.txt
+            ordered_txt = list(dict.fromkeys(reduceLineBreak(f.read().strip()).split("\n")))
+    else:
+        ordered_txt = []
+
+    return ordered_txt
+
+
+def write(txt):
+    if isinstance(txt, list):
+        txt = "\n".join(txt)
+    if Paths.order_path != None:
+        try:
+            with open(Paths.order_path, "w+") as f:
+                f.write(txt)
+            return True
+        except OSError as exc:
+            print(f"failed to edit due to: {exc}")
+    else:
+        if (input("Cannot find scores_order.txt, create new one instead? (Y/n): ")).lower() in ['y', 'yes', 'confirm']:
+            try:
+                with open('genshin_assets\\scores_order.txt', "w+") as f:
+                    f.write(txt)
+                return True
+            except OSError as exc:
+                print(f"failed to create scores_order.txt due to: {exc}")
+        else:
+            print("cancelled")
+        return False
+
+
+def sync():
+    write(Songs.songs_order)
+
+def edit(command, song_name=""):
     if Paths.order_path is None:
         if (input("Cannot find scores_order.txt, create new one instead? (Y/n): ")).lower() in ['y', 'yes',
                                                                                                 'confirm']:
@@ -132,7 +168,7 @@ def edit_order(command, song_name=""):
                                                                                                     'confirm']:
                 Songs.songs_order.remove(target)
                 txt = "\n".join(Songs.songs_order)
-                result = write_order(txt)
+                result = write(txt)
                 if result:
                     print(f"Removed {target} from order")
                     return 1
@@ -198,9 +234,10 @@ def edit_order(command, song_name=""):
         if confirmation in ['y', 'yes', 'confirm']:
             Songs.songs_order.insert(insert_index, target)
             txt = "\n".join(Songs.songs_order)
-            result = write_order(txt)
+            result = write(txt)
             if result:
                 print(f"    Added '{target}' to order")
                 return 1
         else:
             return 0
+

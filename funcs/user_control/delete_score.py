@@ -1,9 +1,9 @@
 try:
     from ...classes import Paths, Songs
-    from ..handler import print_song_list, sync_order
+    from ..handler import print_song_list, order
 except ImportError:
     from classes import Paths, Songs
-    from handler import print_song_list, sync_order
+    from handler import print_song_list, order
 from send2trash import send2trash
 import os
 
@@ -21,7 +21,7 @@ def delete_score(target):
         Songs.songs.pop(target)
         if target in Songs.songs_order:
             Songs.songs_order.pop(Songs.songs_order.index(target))
-            sync_order()
+            order.sync()
         print(f"{target} has been moved to recycle bin\n")
         print_song_list()
     else:

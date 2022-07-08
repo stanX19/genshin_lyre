@@ -1,11 +1,11 @@
 try:
     from ...classes import *
     import test11
-    from ...handler import read_order, print_song_list, refresh_song_list, edit_order
+    from ...handler import order, print_song_list, refresh_song_list
 except ImportError:
     from classes import *
     import test11
-    from handler import read_order, print_song_list, refresh_song_list, edit_order
+    from handler import order, print_song_list, refresh_song_list
 from send2trash import send2trash
 
 
@@ -31,11 +31,11 @@ def test_session(name="", score="", new=False):
         print("Exited test\n")
         return 0
 
-    Songs.songs_order = read_order()
+    Songs.songs_order = order.read()
     if not (name in Songs.songs_order):
         if input("do you want to add this song to order? (Y/N): ").lower() in ['y', 'yes', 'confirm']:
             print_song_list()
             print()
-            if edit_order("add to order", name) == 0:
+            if order.edit("add to order", name) == 0:
                 print("cancelled order editing")
     refresh_song_list()
