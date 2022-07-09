@@ -2,21 +2,21 @@ try:
     from ...utils import return_mouse_coordinate
     from ...utils import print_rows as print_list
     from ...classes import Settings
-    from ..controller import save_settings, get_settings_dict
+    import controller
 except ImportError:
     from utils import return_mouse_coordinate
     from utils import print_rows as print_list
     from classes import Settings
-    from controller import save_settings, get_settings_dict
+    import controller
 
 def set_settings(enter:str):
     enter = enter.replace("set",'').strip()
     i = 0
-    Settings_dict = get_settings_dict()
+    Settings_dict = controller.settings.get_dict()
     while i < 1:
         if 'coordinate' in enter:
             Settings.genshin_app_coordinate = return_mouse_coordinate("genshin_app position")
-            save_settings()
+            controller.settings.save()
             print(f"  genshin_app position is set to {Settings.genshin_app_coordinate}\n")
             break
         elif enter in Settings_dict:
@@ -42,7 +42,7 @@ def set_settings(enter:str):
                     break
             #       object    attr   value
             setattr(Settings, enter, new_value)
-            save_settings()
+            controller.settings.save()
             break
         else:
             print("enter 'q' to quit this mode")

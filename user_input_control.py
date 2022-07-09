@@ -1,6 +1,7 @@
 from srcs import *
 from utils import *
 from classes import *
+import pathlib
 try:
     from .play_song import play_song
 except ImportError:
@@ -64,18 +65,18 @@ def user_input_control(enter=''):
                         break
                 else:
                     os.system('cls')
-                    refresh_song_list()
+                    controller.song_list.refresh()
                 continue
 
             elif "reset" in enter:
                 if "all" in enter:
                     print("  Resetting all users settings, inculding:")
-                    for var in get_settings_dict():
+                    for var in controller.settings.get_dict():
                         print(f"    | {var}")
                     if input("are you sure? (Y/n): ").lower() in ["yes", "y"]:
                         for key, val in Settings.backup.items():
                             setattr(Settings, key, val)
-                        save_settings()
+                        controller.settings.save()
                         print("  All settings resetted")
                 else:
                     UserVaria.song_loop = False
@@ -103,13 +104,13 @@ def user_input_control(enter=''):
             elif 'dark' in enter:
                 os.system('color 07')
             elif "clean" in enter:
-                export.clean()
+                controller.export.clean()
             elif "sort" in enter or "by" in enter.split():
                 if "date" in enter or "time" in enter:
                     if Settings.follow_order:
                         print("  Song list will now be sorted by date created")
                         Settings.follow_order = False
-                        refresh_song_list()
+                        controller.song_list.refresh()
                     else:
                         print("  Song list is already sorted by date created")
                 elif "order" in enter:
@@ -118,7 +119,7 @@ def user_input_control(enter=''):
                         Settings.follow_order = True
                 else:
                     print("  Song list is sorted by{}".format("[order]" if Settings.follow_order else "date created"))
-                save_settings()
+                controller.settings.save()
 
             # notification toggling
             elif "notif" == enter or 'notification' in enter or (
@@ -135,7 +136,7 @@ def user_input_control(enter=''):
                 else:
                     print(
                         f"currently turned {'on' if Settings.notification else 'off'}, include 'on' or 'off' to toggle notification")
-                save_settings()
+                controller.settings.save()
 
             elif "auto" == enter:
                 prompt_control_function(genshin_automation.macros())
@@ -160,12 +161,12 @@ def user_input_control(enter=''):
 
             # commands that need to deal with number
             if 'order' in enter:
-                result = order.edit(enter)
+                result = controller.order.edit(enter)
                 if result == 0:
                     print("exited editing\n")
                 else:
                     print()
-                    refresh_song_list()
+                    controller.song_list.refresh()
                 no_result = False
 
             elif "export" in enter:
@@ -178,7 +179,7 @@ def user_input_control(enter=''):
                     continue
                 try:
                     selected_song = list(Songs.songs.values())[no]
-                    export.export_as_nightly(selected_song)
+                    controller.export.export_as_nightly(selected_song)
                 except IndexError:
                     print("Invalid index")
                 continue
@@ -286,7 +287,7 @@ def user_input_control(enter=''):
 
             elif "rename" in enter:
                 if rename_song(enter) != 0:
-                    refresh_song_list()
+                    controller.song_list.refresh()
                 no_result = False
 
             # Playback speed
@@ -314,7 +315,7 @@ def user_input_control(enter=''):
                     no = re.findall("[-+]?[.]?[\d]+(?:,\d\d\d)*[.]?\d*(?:[eE][-+]?\d+)?", target)
                     if target in list(Songs.songs.keys()):
                         delete_score(target)
-                        refresh_song_list()
+                        controller.song_list.refresh()
                     elif no != []:
                         if float(no[0]) <= len(Songs.songs) and float(no[0]).is_integer():
                             target = list(Songs.songs.keys())[int(no[0]) - 1]

@@ -1,9 +1,9 @@
 try:
     from ...classes import Paths, Songs
-    from ..controller import print_song_list, order
+    import controller
 except ImportError:
     from classes import Paths, Songs
-    from controller import print_song_list, order
+    import controller
 from send2trash import send2trash
 import os
 
@@ -21,8 +21,8 @@ def delete_score(target):
         Songs.songs.pop(target)
         if target in Songs.songs_order:
             Songs.songs_order.pop(Songs.songs_order.index(target))
-            order.sync()
+            controller.order.sync()
         print(f"{target} has been moved to recycle bin\n")
-        print_song_list()
+        controller.song_list.print()
     else:
         print("canceled deletion")

@@ -43,8 +43,8 @@ def run():
     # take scores from /scores directory
     os.chdir(Paths.self_path)
     # must read settings first
-    read_settings()
-    refresh_song_list()
+    controller.settings.read()
+    controller.song_list.refresh()
     # temporary test
     # end of temp test
     if Settings.notification:

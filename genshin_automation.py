@@ -2,7 +2,7 @@ import pyautogui
 import keyboard
 import time
 import os
-from utils import prompt_control_function
+import utils
 
 
 class macros():
@@ -113,4 +113,4 @@ class macros():
                 i+=1
 
 if __name__ == '__main__':
-    prompt_control_function(macros())
+    utils.prompt_control_function(macros())

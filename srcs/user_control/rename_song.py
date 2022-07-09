@@ -1,12 +1,12 @@
 try:
     from ...utils import *
     from ...classes import *
-    from ..controller import order, print_song_list
+    import controller
     from send2trash import send2trash
 except ImportError:
     from utils import *
     from classes import *
-    from controller import order, print_song_list
+    import controller
     from send2trash import send2trash
 
 def rename_song(command):
@@ -39,7 +39,7 @@ def rename_song(command):
                 Songs.songs[new_name] = Songs.songs[original_name]
                 del Songs.songs[original_name]
                 print(f"Temporary: '{original_name}' --> '{new_name}'\n")
-                print_song_list()
+                controller.song_list.print()
             else:
                 print(f"New name already existed, plus this file is not saved in the first place\nCancelled renaming")
                 break
@@ -75,7 +75,7 @@ def rename_song(command):
             if original_name in Songs.songs_order:
                 index = Songs.songs_order.index(original_name)
                 Songs.songs_order[index] = new_name
-                order.write(Songs.songs_order)
+                controller.order.write(Songs.songs_order)
 
             print(f"Success: '{original_name}' --> '{new_name}'\n")
             return 1

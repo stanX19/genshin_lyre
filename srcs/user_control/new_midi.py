@@ -1,12 +1,12 @@
 import os
 import shutil
 try:
-    from ..controller import print_song_list
+    import controller
     import test_session
     from ...classes import *
     from ...utils import *
 except ImportError:
-    from controller import print_song_list
+    import controller
     import test_session
     from classes import *
     from utils import *
@@ -48,7 +48,7 @@ def new_nightly(nightly_path=""):
             print("nightly file will be temporarily added to the song list")
         new_nightly.name = name
         Songs.songs[name] = new_nightly
-        print_song_list()
+        controller.song_list.print()
     except Exception as exc:
         print(f"  Error: {exc}")
     return 1
@@ -102,7 +102,7 @@ def new_midi():
             print("  Midi file will be temporarily added to the song list")
         new_midi.name = name
         Songs.songs[name] = new_midi
-        print_song_list()
+        controller.song_list.print()
     except Exception as exc:
         print(f"  Error: {exc}")
     return 1

@@ -78,9 +78,9 @@ def read_txt_scores():
     if missing_txt: PlayVaria.warnings.append(
         ", ".join(missing_txt) + f" is missing from {Paths.score_path}, please confirm")
 
-def print_song_list():
+def print():
     print_list(list(Songs.songs.keys()), "Song List", max_length=Settings.name_max_length)
 
-def refresh_song_list():
+def refresh():
     read_txt_scores()
-    print_song_list()
+    print()

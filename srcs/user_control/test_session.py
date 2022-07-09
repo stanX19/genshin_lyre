@@ -1,11 +1,9 @@
 try:
     from ...classes import *
-    import test11
-    from ...controller import order, print_song_list, refresh_song_list
 except ImportError:
     from classes import *
-    import test11
-    from controller import order, print_song_list, refresh_song_list
+import test11
+import controller
 from send2trash import send2trash
 
 
@@ -31,11 +29,11 @@ def test_session(name="", score="", new=False):
         print("Exited test\n")
         return 0
 
-    Songs.songs_order = order.read()
+    Songs.songs_order = controller.order.read()
     if not (name in Songs.songs_order):
         if input("do you want to add this song to order? (Y/N): ").lower() in ['y', 'yes', 'confirm']:
-            print_song_list()
+            controller.song_list.print()
             print()
-            if order.edit("add to order", name) == 0:
+            if controller.order.edit("add to order", name) == 0:
                 print("cancelled order editing")
-    refresh_song_list()
+    controller.song_list.refresh()
