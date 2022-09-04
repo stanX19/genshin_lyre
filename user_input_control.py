@@ -2,6 +2,8 @@ from srcs import *
 from utils import *
 from classes import *
 import pathlib
+import difflib
+#from collections import Counter
 try:
     from .play_song import play_song
 except ImportError:
@@ -31,7 +33,9 @@ def user_input_control(enter=''):
                             int(PlayVaria.speed)) if PlayVaria.speed != 1 else ''), end="")
                     continue  # you don't want the song to play twice, theres another player down there
 
-            no = re.findall("[-+]?[.]?[\d]+(?:,\d\d\d)*[.]?\d*(?:[eE][-+]?\d+)?", enter)
+            # ignore the number if it starts with '#'
+            search_string = ' '.join([word for word in enter.split() if word[0] != '#'])
+            no = re.findall("[-+]?[.]?[\d]+(?:,\d\d\d)*[.]?\d*(?:[eE][-+]?\d+)?", search_string)
 
             # convert names to index
             if "speed" not in enter:
@@ -251,7 +255,7 @@ def user_input_control(enter=''):
                         print(f"""    song index is out of range, maximum index is {len(Songs.songs)}""")
 
                 no_result = False
-            elif 'midi' in enter.split():
+            elif 'midi' in enter:
                 if 'new' in enter:
                     new_midi()
                 else:
@@ -304,12 +308,13 @@ def user_input_control(enter=''):
             # score deleter
             elif "delete" in enter or "rm" in enter.split():
                 # no = re.findall("[-+]?[.]?[\d]+(?:,\d\d\d)*[.]?\d*(?:[eE][-+]?\d+)?", enter)
-                if no != []:
-                    if float(no[0]) <= len(Songs.songs) and float(no[0]).is_integer():
-                        target = list(Songs.songs.keys())[int(no[0]) - 1]
-                        delete_score(target)
-                    else:
-                        print("Invalid integer")
+                if no:
+                    for idx in no:
+                        if float(idx).is_integer() and float(idx) <= len(Songs.songs) :
+                            target = list(Songs.songs.keys())[int(idx) - 1]
+                            delete_score(target)
+                        else:
+                            print(f"Invalid index: {idx}")
                 else:
                     target = input("Score name or integer: ")
                     no = re.findall("[-+]?[.]?[\d]+(?:,\d\d\d)*[.]?\d*(?:[eE][-+]?\d+)?", target)
@@ -330,16 +335,45 @@ def user_input_control(enter=''):
 
             elif not enter in Songs.songs and len(enter) >= 2:  # if all above 'elif' cannot match song name
                 # change short form to song name
-                words_name = {}
-                words = enter
-                for names in list(Songs.songs.keys()):
-                    if words in names.split(" "):
-                        words_name[names.find(words)] = names
-                    elif words in names:
-                        words_name[names.find(words) + 1] = names
+                # priority:
+                # is whole word > block count > index_found > ratio
+                # (1, 2, 40) < (1, 3, 1)
+                # if in whole word, block count must = 1
+                # let whole word = 0, and block count start from 1
 
-                if words_name != {}:
-                    enter = words_name[min(words_name.keys())]
+                # min (- is whole word + block count + missing / x, -index, -ratio)
+                enter = enter.replace('\\','')
+                results = {}
+                matcher = difflib.SequenceMatcher(a=enter)
+
+                for full_name in Songs.songs:
+                    matcher.set_seq2(b=full_name)
+                    blocks = [i for i in matcher.get_matching_blocks() if i.size > 0]  # all match with len >= 1
+                    # print(f"{full_name}: {blocks}")
+                    if blocks:  # only if there is a match
+                        # include in result
+                        if enter in full_name.split():  # special case
+                            results[full_name] = [-1]
+                        else:
+                            size_matched = 0
+                            for block in blocks:
+                                size_matched += block.size
+                            missing = len(enter) - size_matched  # 0 ~ len(enter)-1
+                            if missing > Settings.search_max_missing:  # too off
+                                continue  # to next full name
+                            # the lesser len(block) is, the better
+                            # if len(block increases by 1, and missing decreases by 2, its balanced out
+                            # number of char is worth for 1 break here:   ↓
+                            results[full_name] = [len(blocks) + missing / Settings.search_break_weight_ratio]  # 0 ~ inf
+                        # index found
+                        results[full_name].append(blocks[0].b)  # 0~inf
+                        # ratio
+                        results[full_name].append(-matcher.quick_ratio())  # 0~0.9999
+
+                # for result in sorted(results, key=lambda x: results[x], reverse=True):
+                #     print(f"{result}: {results[result]}")
+                if results:
+                    enter = min(results, key=lambda x: results[x])
 
             if enter in Songs.songs:
                 PlayVaria.song_index = 0

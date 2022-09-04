@@ -8,8 +8,9 @@ txjg
 qifengle
 chen qing ling - wu ji
 scumbag system op
-blue bird
 touhou mountain of faith
+this game
+blue bird
 skycastle
 merry go round (moving castle)
 you are in love (moving castle)
@@ -27,7 +28,6 @@ orange 7
 your lie in april op
 silhouette
 unravel
-this game
 akuma no ko
 how to train your dragon (blue)
 crossing field (sao)
@@ -41,12 +41,14 @@ vivy sing my pleasure
 vivy ensemble for polaris
 vivy fluorite eyes song
 assasins pride ed
+assassins pride ed - ijin tachi no jikan [piano arrangement]
 homura
 majo no tabi
 black catcher
 xyz op
 colors (code geass)
 rise-midi
+avid
 yoru ni kakeru
 harehare ya
 illusionary daytime
@@ -70,9 +72,13 @@ houkai sekai no uthame
 rubia
 moon halo
 regression
+true
+elysian realm ed
+genshin main theme
 dihua
 tender strength
 say my name
+dawn winery theme
 serenitea pot theme
 guizhong
 rapid as wildfire
@@ -105,6 +111,8 @@ chasm surface #1
 chasm surface #2
 chasm surface #3
 chasm underground #4
+gandharva ville
+sumeru city
 tevyat chapter
 hym of pearl
 hues of the violet garden
@@ -143,3 +151,7 @@ yae miko pv
 yae miko demo
 ayato pv
 ayato demo
+heizou demo
+tighnari pv
+tighnari demo
+collei demo

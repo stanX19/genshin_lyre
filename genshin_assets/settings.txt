@@ -1,1 +1,15 @@
-{"genshin_app_coordinate": [955, 1052], "notification": true, "include_sharps": true, "follow_order": true, "midi_beat_threshold": 0, "midi_offset": 0, "midi_kill_delay": false, "name_max_length": 30}
+{
+  "genshin_app_coordinate": [
+    703,
+    1050
+  ],
+  "notification": true,
+  "include_sharps": true,
+  "follow_order": true,
+  "midi_beat_threshold": 0,
+  "midi_offset": 0,
+  "midi_kill_delay": false,
+  "name_max_length": 30,
+  "search_break_weight_ratio": 2.0,
+  "search_max_missing": 2
+}
