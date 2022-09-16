@@ -2,7 +2,6 @@ from srcs import *
 from utils import *
 from classes import *
 import pathlib
-import difflib
 #from collections import Counter
 try:
     from .play_song import play_song
@@ -16,15 +15,18 @@ except ImportError:
         def macros(cls):
             print("genshin_automation.py is not found")
 
+
 def user_input_control(enter=''):
     """execute various function via cmd, mainly playing songs in Songs.songs
     does not return any value"""
     loop = not enter  # no loop if specific command(enter) is given
     while loop:
-        no_result = False
         if loop:  # always true if no default enter is given
             enter = input("song name: ").lower()
         if enter != "":
+            no_result = False
+            integer_not_used = False
+
             if enter.isnumeric():
                 if int(enter) <= len(Songs.songs):
                     play_song(int(enter) - 1)
@@ -33,17 +35,15 @@ def user_input_control(enter=''):
                             int(PlayVaria.speed)) if PlayVaria.speed != 1 else ''), end="")
                     continue  # you don't want the song to play twice, theres another player down there
 
+            # convert names to index
+            if "speed" not in enter:
+                for song_name in sorted(list(Songs.songs.keys()), reverse=True):
+                    if song_name in enter:
+                        enter = enter.replace(song_name, f"{list(Songs.songs).index(song_name) + 1}")
+
             # ignore the number if it starts with '#'
             search_string = ' '.join([word for word in enter.split() if word[0] != '#'])
             no = re.findall("[-+]?[.]?[\d]+(?:,\d\d\d)*[.]?\d*(?:[eE][-+]?\d+)?", search_string)
-
-            # convert names to index
-            if "speed" not in enter:
-                for i, e in enumerate(list(Songs.songs.keys())):
-                    if e in enter:
-                        enter = enter.replace(e, str(i + 1))
-                        no = [str(i + 1)]
-                        break
 
             # commands that dont need to deal with number, (can be used together with song index to play song)
             if "list" in enter or "ls" in enter:
@@ -309,79 +309,47 @@ def user_input_control(enter=''):
             elif "delete" in enter or "rm" in enter.split():
                 # no = re.findall("[-+]?[.]?[\d]+(?:,\d\d\d)*[.]?\d*(?:[eE][-+]?\d+)?", enter)
                 if no:
-                    for idx in no:
-                        if float(idx).is_integer() and float(idx) <= len(Songs.songs) :
-                            target = list(Songs.songs.keys())[int(idx) - 1]
-                            delete_score(target)
-                        else:
-                            print(f"Invalid index: {idx}")
+                    delete_score(*no)
                 else:
                     target = input("Score name or integer: ")
                     no = re.findall("[-+]?[.]?[\d]+(?:,\d\d\d)*[.]?\d*(?:[eE][-+]?\d+)?", target)
-                    if target in list(Songs.songs.keys()):
-                        delete_score(target)
-                        controller.song_list.refresh()
-                    elif no != []:
-                        if float(no[0]) <= len(Songs.songs) and float(no[0]).is_integer():
-                            target = list(Songs.songs.keys())[int(no[0]) - 1]
-                            delete_score(target)
+                    best_match = user_input_best_match(enter, Songs.songs,
+                                                       Settings.search_max_missing,
+                                                       Settings.search_break_weight_ratio)
+                    if best_match:
+                        delete_score(list(Songs.songs).index(target) + 1)
+                    elif no:
+                        delete_score(*no)
                     else:
                         print("invalid input")
                 no_result = False
 
-            elif no != [] and "." not in no[0] and int(no[0]) <= len(Songs.songs):
-                enter = list(Songs.songs.keys())[
-                    int(no[0]) - 1]
+            # all the above didn't use the integer inputted
+            else:
+                integer_not_used = True
 
-            elif not enter in Songs.songs and len(enter) >= 2:  # if all above 'elif' cannot match song name
+            # try to find song_no from unused command
+            song_no = None
+            if integer_not_used and no != [] and "." not in no[0] and int(no[0]) <= len(Songs.songs):
+                song_no = int(no[0]) - 1
+
+            elif enter in Songs.songs:
+                song_no = list(Songs.songs.keys()).index(enter)
+
+            elif no_result and len(enter) >= 2:
                 # change short form to song name
-                # priority:
-                # is whole word > block count > index_found > ratio
-                # (1, 2, 40) < (1, 3, 1)
-                # if in whole word, block count must = 1
-                # let whole word = 0, and block count start from 1
+                best_match = user_input_best_match(enter, Songs.songs,
+                                                   Settings.search_max_missing,
+                                                   Settings.search_break_weight_ratio)
+                if best_match:
+                    song_no = list(Songs.songs.keys()).index(best_match)
 
-                # min (- is whole word + block count + missing / x, -index, -ratio)
-                enter = enter.replace('\\','')
-                results = {}
-                matcher = difflib.SequenceMatcher(a=enter)
-
-                for full_name in Songs.songs:
-                    matcher.set_seq2(b=full_name)
-                    blocks = [i for i in matcher.get_matching_blocks() if i.size > 0]  # all match with len >= 1
-                    # print(f"{full_name}: {blocks}")
-                    if blocks:  # only if there is a match
-                        # include in result
-                        if enter in full_name.split():  # special case
-                            results[full_name] = [-1]
-                        else:
-                            size_matched = 0
-                            for block in blocks:
-                                size_matched += block.size
-                            missing = len(enter) - size_matched  # 0 ~ len(enter)-1
-                            if missing > Settings.search_max_missing:  # too off
-                                continue  # to next full name
-                            # the lesser len(block) is, the better
-                            # if len(block increases by 1, and missing decreases by 2, its balanced out
-                            # number of char is worth for 1 break here:   ↓
-                            results[full_name] = [len(blocks) + missing / Settings.search_break_weight_ratio]  # 0 ~ inf
-                        # index found
-                        results[full_name].append(blocks[0].b)  # 0~inf
-                        # ratio
-                        results[full_name].append(-matcher.quick_ratio())  # 0~0.9999
-
-                # for result in sorted(results, key=lambda x: results[x], reverse=True):
-                #     print(f"{result}: {results[result]}")
-                if results:
-                    enter = min(results, key=lambda x: results[x])
-
-            if enter in Songs.songs:
+            if song_no is not None:
                 PlayVaria.song_index = 0
-                play_song(list(Songs.songs.keys()).index(enter))  # output (index of song)
-                print("{}".format(
-                    'note: Playback speed is still turned on, set at {}x, enter new speed or enter \'reset\' to reset all variables\n'.format(
-                        int(PlayVaria.speed)) if PlayVaria.speed != 1 else ''), end="")
+                play_song(song_no)
+                if PlayVaria.speed != 1:
+                    print(f'note: Playback speed is still turned on, set at {PlayVaria.speed}x,\
+enter new speed or enter \'reset\' to reset all variables\n', end="")
 
             elif no_result:
-                no_result = False
                 print("key not found, enter 'i' to exit")

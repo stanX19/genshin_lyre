@@ -1,3 +1,4 @@
+import pyautogui
 try:
     from ...utils import return_mouse_coordinate
     from ...utils import print_rows as print_list
@@ -58,3 +59,6 @@ def set_settings(enter:str):
             else:
                 enter = command
         i += 1
+
+    # external library settings
+    pyautogui.FAILSAFE = Settings.pyautoguiFAILSAFE

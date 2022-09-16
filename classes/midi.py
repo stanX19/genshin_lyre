@@ -148,7 +148,7 @@ class Midi:
 
                 if type(score_list[-1]) == str:
                     #  sharp handling
-                    if stated_note == '' and Settings.include_sharps:
+                    if stated_note == '' and Settings.midi_include_sharps:
                         minus1 = self.note_keys[msg.note - 1]
                         if len(score_list) < 5 or minus1 in score_list[-3] or minus1 in score_list[-5]:
                             stated_note = self.note_keys[msg.note + 1]
@@ -157,7 +157,7 @@ class Midi:
                     score_list[-1] += stated_note
                 else:  # prev element is float
                     #  sharp handling
-                    if stated_note == '' and Settings.include_sharps:
+                    if stated_note == '' and Settings.midi_include_sharps:
                         minus1 = self.note_keys[msg.note - 1]
                         if len(score_list) < 4 or minus1 in score_list[-2] or minus1 in score_list[-4]:
                             stated_note = self.note_keys[msg.note + 1]

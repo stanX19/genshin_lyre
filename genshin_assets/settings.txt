@@ -3,13 +3,14 @@
     703,
     1050
   ],
+  "pyautoguiFAILSAFE": true,
   "notification": true,
-  "include_sharps": true,
-  "follow_order": true,
+  "follow_order": false,
+  "midi_include_sharps": true,
   "midi_beat_threshold": 0,
   "midi_offset": 0,
   "midi_kill_delay": false,
   "name_max_length": 30,
-  "search_break_weight_ratio": 2.0,
-  "search_max_missing": 2
+  "search_break_weight_ratio": 1.0,
+  "search_max_missing": 1
 }

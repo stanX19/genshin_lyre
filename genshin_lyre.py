@@ -35,7 +35,7 @@ from send2trash import send2trash
 def run():
     # with this moving mouse to corner wont activate failsafe
     # but you will need be very careful with pyautogui
-    #pyautogui.FAILSAFE = False
+    pyautogui.FAILSAFE = Settings.pyautoguiFAILSAFE
     # reset variables
     UserVaria.song_loop = False
     PlayVaria.speed = 1
@@ -67,7 +67,7 @@ def main():
             print_cmd_color("darkYellow", f"\nError due to: {exc}\n")
             time.sleep(1)
             print("restarting program...")
-            time.sleep(1.5)
+            time.sleep(1)
 
 if __name__ == "__main__":
     main()
