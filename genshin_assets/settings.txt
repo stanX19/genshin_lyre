@@ -5,12 +5,11 @@
   ],
   "pyautoguiFAILSAFE": true,
   "notification": true,
-  "follow_order": false,
+  "follow_order": true,
   "midi_include_sharps": true,
   "midi_beat_threshold": 0,
   "midi_offset": 0,
-  "midi_kill_delay": false,
   "name_max_length": 30,
   "search_break_weight_ratio": 1.0,
-  "search_max_missing": 1
+  "search_max_missing": 0
 }

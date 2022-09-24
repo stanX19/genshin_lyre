@@ -5,7 +5,6 @@ follow_order = True
 midi_include_sharps = True
 midi_beat_threshold = 0
 midi_offset = 0
-midi_kill_delay = True
 name_max_length = 30
 search_break_weight_ratio = 2.0
 search_max_missing = 2

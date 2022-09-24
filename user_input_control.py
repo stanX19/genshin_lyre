@@ -330,7 +330,7 @@ def user_input_control(enter=''):
 
             # try to find song_no from unused command
             song_no = None
-            if integer_not_used and no != [] and "." not in no[0] and int(no[0]) <= len(Songs.songs):
+            if integer_not_used and no and '.' not in no[0] and int(no[0]) <= len(Songs.songs):
                 song_no = int(no[0]) - 1
 
             elif enter in Songs.songs:

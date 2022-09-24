@@ -34,14 +34,8 @@ class Nightly():
 
             # there is note
             if temp_store:
-                temp_store = "".join(set(temp_store))
-                if Settings.midi_kill_delay and self.score_list[-1] < 0.11 \
-                        and self.score_list[0] is not self.score_list[-1]:
-                    extra = "." * int(self.score_list[-1] / 0.007)
-                    self.score_list.pop(-1)
-                    self.score_list[-1] += extra + temp_store
-                else:
-                    self.score_list.append(temp_store)
+                temp_store = "".join(set(temp_store))  # kill repeat
+                self.score_list.append(temp_store)
                 self.score_list.append(0.0)
             self.score_list[-1] += beat / (data[0]+1)
 
@@ -53,6 +47,7 @@ class Nightly():
         return score_list_to_score(self.score_list)
 
     def play(self, waitForK=False):
+        pyautogui.PAUSE = 0
         if waitForK:
             keyboard.wait("k")
 
@@ -80,5 +75,6 @@ class Nightly():
                 elif duration_to_next_event < threshold:
                     start_time = time.time() - fixed_time + threshold
             if type(msg) == str:
+                #for _msg in msg.split('.'):
                 pyautogui.typewrite(msg)
             PlayVaria.song_index += 1

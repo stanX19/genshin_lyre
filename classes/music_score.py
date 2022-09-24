@@ -58,7 +58,7 @@ class old_music_score():
 
     # old music score
     def play(self):
-
+        pyautogui.PAUSE = 0.1
         PlayVaria.temp_beat = self.beat / PlayVaria.speed
         while PlayVaria.song_index < len(self.keys):
 
@@ -123,6 +123,7 @@ class old_music_score():
 
 class music_score(old_music_score):
     def play(self):
+        pyautogui.PAUSE = 0.1
         if PlayVaria.song_index == 0:
             PlayVaria.temp_beat = self.beat / PlayVaria.speed
         while PlayVaria.song_index < len(self.keys):
