@@ -66,7 +66,7 @@ class Nightly():
                 PlayVaria.song_index -= 50 if PlayVaria.song_index > 49 else 0
                 continue
             if keyboard.is_pressed("right"):
-                time.sleep(0.1)  # the original delay of pyautogui
+                time.sleep(0.01)  # the original delay of pyautogui
             else:
                 if type(msg) == float:
                     fixed_time += msg / PlayVaria.speed  # time that should've pass
