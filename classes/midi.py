@@ -171,7 +171,6 @@ class Midi:
             score_list.pop(-1)
         return score_list
 
-
     def play(self, waitForK=False):
         pyautogui.PAUSE = 0
         self.tune_to_C()
@@ -192,7 +191,10 @@ class Midi:
                 while keyboard.is_pressed("left"):
                     pass
                 PlayVaria.song_index -= 50 if PlayVaria.song_index > 49 else 0
-            if not keyboard.is_pressed("right"):
+                continue
+            if keyboard.is_pressed("right"):
+                time.sleep(0.1)
+            else:
                 if type(msg) == float:
                     fixed_time += msg/PlayVaria.speed  # time that should've pass
                 actual_playback_time = time.time() - start_time
@@ -202,6 +204,7 @@ class Midi:
                     time.sleep(duration_to_next_event)
                 elif duration_to_next_event < threshold:
                     start_time = time.time() - fixed_time + threshold
+
             if type(msg) == str:
                 pyautogui.typewrite(msg)
             PlayVaria.song_index += 1

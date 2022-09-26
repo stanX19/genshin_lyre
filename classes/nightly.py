@@ -7,7 +7,7 @@ from data import *
 from functools import cached_property
 
 class Nightly():
-    def __init__(self,text:str):
+    def __init__(self,text: str):
         try:
             with open(text, encoding="utf-8") as f:
                 text = json.load(f)[0]
@@ -64,7 +64,10 @@ class Nightly():
                 while keyboard.is_pressed("left"):
                     pass
                 PlayVaria.song_index -= 50 if PlayVaria.song_index > 49 else 0
-            if not keyboard.is_pressed("right"):
+                continue
+            if keyboard.is_pressed("right"):
+                time.sleep(0.1)  # the original delay of pyautogui
+            else:
                 if type(msg) == float:
                     fixed_time += msg / PlayVaria.speed  # time that should've pass
                 actual_playback_time = time.time() - start_time
@@ -74,7 +77,7 @@ class Nightly():
                     time.sleep(duration_to_next_event)
                 elif duration_to_next_event < threshold:
                     start_time = time.time() - fixed_time + threshold
+
             if type(msg) == str:
-                #for _msg in msg.split('.'):
                 pyautogui.typewrite(msg)
             PlayVaria.song_index += 1
