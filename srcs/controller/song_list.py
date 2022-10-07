@@ -55,8 +55,7 @@ def read_txt_scores():
         elif os.path.exists(f"{Paths.mid_path}\\{txt_file}.mid"):
             midi_path = f"{Paths.mid_path}\\{txt_file}.mid"
             try:
-                midi_file = Midi(midi_path)
-                midi_file.name = txt_file
+                midi_file = Midi(midi_path, name=txt_file)
                 Songs.songs[txt_file] = midi_file
             except ValueError as exc:
                 print_cmd_color(f"DarkYellow", f"""Error: {exc}""")
@@ -66,8 +65,7 @@ def read_txt_scores():
         elif os.path.exists(f"{Paths.nightly_path}\\{txt_file}.json"):
             nightly_path = f"{Paths.nightly_path}\\{txt_file}.json"
             try:
-                nightly_file = Nightly(nightly_path)
-                nightly_file.name = txt_file
+                nightly_file = Nightly(nightly_path, name=txt_file)
                 Songs.songs[txt_file] = nightly_file
             except Exception as exc:
                 print_cmd_color(f"DarkYellow", f"""Error: {exc}""")

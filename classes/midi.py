@@ -4,6 +4,7 @@ from data import *
 import keyboard
 import pyautogui
 import time
+import math
 try:
     from ...utils import *
 except ImportError:
@@ -11,12 +12,36 @@ except ImportError:
 
 
 class Midi:
-    def __init__(self, midi_path: str):
+
+    def __init__(self, midi_path: str, name=""):
         if midi_path.endswith(".mid"):
             self.path = midi_path
+            self.name = name
             self._MIdiFile = None
         else:
             raise ValueError(f"Expecting midi file type, got '.{midi_path.split('.')[-1]}' file type instead\n")
+
+    def __str__(self):
+        score_list = [val for val in self.to_score_list() if type(val) == float]
+        total_length = sum(score_list)
+        if total_length > 60:
+            song_length = f"{math.floor(total_length / 60)}m {round(total_length % 60)}s"
+        else:
+            song_length = f"{round(total_length)}s"
+        lowest_sharp, total_key = self.tune_to_C()
+        percentage = round(lowest_sharp / total_key * 100, 1)
+        if lowest_sharp > 0:
+            suitability = f"lowest sharp is {lowest_sharp} out of {total_key} keys"
+            if percentage > 0:
+                suitability += f" -{percentage}%-, score may sound weird"
+        else:
+            suitability = "midi is tuned to C"
+        return f"""    STATS FOR {self.name}:
+      TYPE        : Midi file
+      SAVED AS    : {self.name}.mid
+      LENGTH      : {song_length}
+      SUITABILITY : {suitability}
+    """
     @property
     def MIdiFile(self):
         if not self._MIdiFile:

@@ -34,35 +34,6 @@ def print_stats(no):
       SAVED AS  : {song_name}.txt
     """)
     elif isinstance(FILE, Midi):
-        score_list = [val for val in FILE.to_score_list() if type(val) == float]
-        total_length = sum(score_list)
-        if total_length > 60:
-            song_length = f"{math.floor(total_length / 60)}m {round(total_length % 60)}s"
-        else:
-            song_length = f"{round(total_length)}s"
-        lowest_sharp, total_key = FILE.tune_to_C()
-        percentage = round(lowest_sharp / total_key * 100, 1)
-        if lowest_sharp > 0:
-            suitability = f"lowest sharp is {lowest_sharp} out of {total_key} keys"
-            if percentage > 0:
-                suitability += f" -{percentage}%-, score may sound weird"
-        else:
-            suitability = "midi is tuned to C"
-        print(f"""    STATS FOR {song_name}:
-      TYPE        : Midi file
-      SAVED AS    : {song_name}.mid
-      LENGTH      : {song_length}
-      SUITABILITY : {suitability}
-    """)
+        print(FILE)
     elif isinstance(FILE, Nightly):
-        float_list = [val for val in FILE.score_list if type(val) == float]
-        total_length = sum(float_list)
-        if total_length > 60:
-            song_length = f"{math.floor(total_length / 60)}m {round(total_length % 60)}s"
-        else:
-            song_length = f"{round(total_length)}s"
-        print(f"""    STATS FOR {song_name}:
-      TYPE        : nightly score
-      SAVED AS    : {song_name}.json
-      LENGTH      : {song_length}
-            """)
+        print(FILE)

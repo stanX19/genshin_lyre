@@ -2,12 +2,13 @@ import json
 import keyboard
 import pyautogui
 import time
+import math
 from utils import score_list_to_score
 from data import *
 from functools import cached_property
 
 class Nightly():
-    def __init__(self,text: str):
+    def __init__(self,text: str, name=""):
         try:
             with open(text, encoding="utf-8") as f:
                 text = json.load(f)[0]
@@ -18,6 +19,7 @@ class Nightly():
             bpm = text["bpm"]
         except KeyError:
             raise Exception('Cannot process recorded version of nightly file')
+        self.name = name
         KEYS = ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'A', 'S', 'D', 'F', 'G', 'H', 'J', 'Z', 'X', 'C', 'V', 'B', 'N', 'M']
         NOTES = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
         NOTE_KEY = dict(zip(NOTES, KEYS))
@@ -38,6 +40,18 @@ class Nightly():
                 self.score_list.append(temp_store)
                 self.score_list.append(0.0)
             self.score_list[-1] += beat / (data[0]+1)
+
+    def __str__(self):
+        total_length = sum([val for val in self.score_list if isinstance(val, float)])
+        if total_length > 60:
+            song_length = f"{math.floor(total_length / 60)}m {round(total_length % 60)}s"
+        else:
+            song_length = f"{round(total_length)}s"
+        return f"""    STATS FOR {self.name}:
+      TYPE        : nightly score
+      SAVED AS    : {self.name}.json
+      LENGTH      : {song_length}
+                """
 
     @property
     def raw_keys(self):
