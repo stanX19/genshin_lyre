@@ -40,7 +40,7 @@ class WindowsBalloonTip:
         win32gui.PostQuitMessage(0)  # Terminate the app.
 
 Notifier = WindowsBalloonTip()
-def notify(title="test", description="successful"):
+def windows_notify(title="test", description="successful"):
 
     Notifier.notify(title, description)
 

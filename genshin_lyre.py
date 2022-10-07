@@ -29,6 +29,7 @@ if Libs.ToInstall:
 
 from mido import MidiFile
 import pyautogui
+import tkinter as tk
 import keyboard
 from send2trash import send2trash
 
@@ -49,7 +50,7 @@ def run():
     # end of temp test
     if Settings.notification:
         try:
-            notify("testing...", "script ready")
+            notify("testing...\nscript ready")
         except Exception:
             Settings.notification = False
 
@@ -68,6 +69,10 @@ def main():
             time.sleep(1)
             print("restarting program...")
             time.sleep(1)
+    #root.destroy()
 
 if __name__ == "__main__":
     main()
+    #root.after(0, main)
+    #notify("testing...\nscript ready")
+    #root.mainloop()
