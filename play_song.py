@@ -14,7 +14,7 @@ def play_song(song_idx):
         except IndexError:
             last_song = list(Songs.songs.keys())[len(Songs.songs) - 1]
         notify(f"currently playing: {current_song}\npre: {last_song}\nnext: {next_song}")
-    #time.sleep(1)
+    time.sleep(1)
     pyautogui.click(Settings.genshin_app_coordinate)
     last_action = time.time()
     while not keyboard.is_pressed('i'):
@@ -65,10 +65,14 @@ def play_song(song_idx):
 
         if keyboard.is_pressed(".") or keyboard.is_pressed(","):
             if keyboard.is_pressed("."):
+                while keyboard.is_pressed("."):
+                    pass
                 song_idx = (song_idx + 1) if song_idx < len(
                     Songs.songs) - 1 else 0
 
             elif keyboard.is_pressed(","):
+                while keyboard.is_pressed(","):
+                    pass
                 song_idx = (song_idx - 1) if song_idx != 0 else len(
                     Songs.songs) - 1
 
@@ -112,7 +116,7 @@ def play_song(song_idx):
                     last_song = list(Songs.songs.keys())[song_idx - 1]
                 except IndexError:
                     last_song = list(Songs.songs.keys())[len(Songs.songs) - 1]
-                notify(f"currently playing: {current_song}\npre: {last_song}\nnext: {next_song}")
+                notify(f"pre: {last_song}\ncurrently playing: {current_song}\nnext: {next_song}")
                 # time.sleep(0.3)
             # pyautogui.click(Settings.genshin_app_coordinate)
             PlayVaria.song_index = 0

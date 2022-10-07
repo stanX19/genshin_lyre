@@ -1,4 +1,5 @@
 import tkinter as tk
+import time
 import threading
 
 def round_rectangle(canvas, x1, y1, x2, y2, radius, **kwargs):
@@ -58,6 +59,7 @@ class Dragpad(tk.Canvas):
 class FadeAway(tk.Toplevel):
     def __init__(self, *args, **kwargs):
         tk.Toplevel.__init__(self, *args, **kwargs)
+        self.is_dead = False
 
         # default opacity:
         self.opacity = 0.7
@@ -71,7 +73,7 @@ class FadeAway(tk.Toplevel):
         self.bind("<ButtonRelease-1>", self.start_countdown, add='+')
 
         # fade away
-        self.bomb = self.after(3000, self.fade_away)
+        self.bomb = self.after(2000, self.fade_away)
 
     def end_countdown(self, event):
         if self.bomb:
@@ -89,6 +91,7 @@ class FadeAway(tk.Toplevel):
             self.bomb = self.after(10, self.fade_away)
         else:
             self.destroy()
+            self.is_dead = True
 
 class Notification(FadeAway):
     def __init__(self, text="", fontsize=25, *wargs, **kwargs):
@@ -152,29 +155,39 @@ class Notification(FadeAway):
                               )
         self.label.place(x=-10,y=-5,)
 
+# def tk_notify(text="1\n2\n3",font=15):
+#     Notifier.notify(text, font)
 
-class Notifier:
-    _window = None
-    @classmethod
-    def notify(cls, text, font):
-        if cls._window:
-            cls._window.destroy()
-        cls._window = Notification(text, font)
-
+def notify_mainloop():
+    window = None
+    while True:
+        new_args = QUEUE.recv()
+        if new_args[0] == 0:
+            return
+        if window:
+            window.destroy()
+        window = Notification(*new_args)
+        while not window.is_dead:
+            root.update_idletasks()
+            root.update()
 
 def tk_notify(text="1\n2\n3",font=15):
-    Notifier.notify(text, font)
+    QUEUE.send((text,font))
+
+def set_queue(queue):
+    global QUEUE
+    QUEUE = queue
 
 def main():
     tk_notify("bruh")
     root.after(5000, tk_notify, "am i a joke?")
     root.after(10000, root.destroy)
 
-
+# known that we wont run tk as main program
 root = tk.Tk()
 root.withdraw()
+QUEUE = None
+NEW_ARGS = None
 
 if __name__ == '__main__':
-    root.after(1000, main)
-    root.mainloop()
-    print("ended")
+    pass
