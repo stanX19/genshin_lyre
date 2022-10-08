@@ -14,7 +14,7 @@ def play_song(song_idx):
         except IndexError:
             last_song = list(Songs.songs.keys())[len(Songs.songs) - 1]
         notify(f"currently playing: {current_song}\npre: {last_song}\nnext: {next_song}")
-    time.sleep(1)
+    # time.sleep(1)
     pyautogui.click(Settings.genshin_app_coordinate)
     last_action = time.time()
     while not keyboard.is_pressed('i'):
@@ -86,37 +86,33 @@ def play_song(song_idx):
             # pyautogui.press("win")
             # keyboard.unhook_all()  # unlock the blocks
 
-            escape_time = time.time() + 0.5  # time before confirming what songs to play
-            while time.time() < escape_time:
-
-                if keyboard.is_pressed("."):
-                    while keyboard.is_pressed("."):
-                        pass
-                    song_idx = (song_idx + 1) if song_idx < (
-                                len(Songs.songs) - 1) else 0
-                    escape_time = time.time() + 1
-                    print(
-                        f"currently playing: {list(Songs.songs.keys())[song_idx]} ({song_idx + 1})")
-                elif keyboard.is_pressed(","):
-                    while keyboard.is_pressed(","):
-                        pass
-                    song_idx = (song_idx - 1) if song_idx != 0 else len(
-                        Songs.songs) - 1
-                    escape_time = time.time() + 1
-                    print(
-                        f"currently playing: {list(Songs.songs.keys())[song_idx]} ({song_idx + 1})")
+            # escape_time = time.time() + 0  # time before confirming what songs to play
+            # while time.time() < escape_time:
+            #
+            #     if keyboard.is_pressed("."):
+            #         while keyboard.is_pressed("."):
+            #             pass
+            #         song_idx = (song_idx + 1) if song_idx < (
+            #                     len(Songs.songs) - 1) else 0
+            #         escape_time = time.time() + 1
+            #         print(
+            #             f"currently playing: {list(Songs.songs.keys())[song_idx]} ({song_idx + 1})")
+            #     elif keyboard.is_pressed(","):
+            #         while keyboard.is_pressed(","):
+            #             pass
+            #         song_idx = (song_idx - 1) if song_idx != 0 else len(
+            #             Songs.songs) - 1
+            #         escape_time = time.time() + 1
+            #         print(
+            #             f"currently playing: {list(Songs.songs.keys())[song_idx]} ({song_idx + 1})")
 
             if Settings.notification:
-                current_song = list(Songs.songs.keys())[song_idx]
-                try:
-                    next_song = list(Songs.songs.keys())[song_idx + 1]
-                except IndexError:
-                    next_song = list(Songs.songs.keys())[0]
-                try:
-                    last_song = list(Songs.songs.keys())[song_idx - 1]
-                except IndexError:
-                    last_song = list(Songs.songs.keys())[len(Songs.songs) - 1]
-                notify(f"pre: {last_song}\ncurrently playing: {current_song}\nnext: {next_song}")
+                all_songs = list(Songs.songs.keys())
+                next_idx = song_idx + 1 if song_idx + 1 != len(all_songs) else 0
+                last_idx = song_idx - 1 if song_idx > 0 else len(all_songs) - 1
+                notify(f"({last_idx + 1}) {all_songs[last_idx]}\n\
+({song_idx + 1}) {all_songs[song_idx]}           (currently playing)\n\
+({next_idx + 1}) {all_songs[next_idx]}")
                 # time.sleep(0.3)
             # pyautogui.click(Settings.genshin_app_coordinate)
             PlayVaria.song_index = 0

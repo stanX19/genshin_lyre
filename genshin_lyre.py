@@ -59,8 +59,8 @@ def run():
     print("enter song key to play, enter 'help' for details, enter 'i' to exit")
     return user_input_control()
 
-def error_handler(QUEUE=None):#*args, **kwargs):
-    set_queue(QUEUE)
+def error_handler(receiver, sender, *args, **kwargs):
+    set_pipe(receiver, sender)
     sys.stdin = open(0)
     while True:
         try:
@@ -71,13 +71,13 @@ def error_handler(QUEUE=None):#*args, **kwargs):
             time.sleep(1)
             print("restarting program...")
             time.sleep(1)
-    notify(0)
+    notify(None)
 
 def main():
     from multiprocessing import Process, Pipe
     receiver, sender = Pipe(False)
-    set_queue(receiver)
-    p = Process(target=error_handler, args=(sender,))
+    set_pipe(receiver, sender)
+    p = Process(target=error_handler, args=(receiver, sender))
     p.start()
     notify_mainloop()
 

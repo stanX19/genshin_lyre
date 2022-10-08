@@ -161,22 +161,30 @@ class Notification(FadeAway):
 def notify_mainloop():
     window = None
     while True:
-        new_args = QUEUE.recv()
-        if new_args[0] == 0:
+        new_args = PARENT.recv()
+        if new_args == 0:
+            pass
+        elif new_args[0] is None:
             return
-        if window:
-            window.destroy()
-        window = Notification(*new_args)
-        while not window.is_dead:
-            root.update_idletasks()
-            root.update()
+        elif new_args != 0:
+            if window:  # Not first window / there is a existing window
+                window.destroy()
+                PARENT.recv()
+            window = Notification(*new_args)
+        if window.is_dead:
+            window = None
+        else:
+            CHILD.send(0)
+        root.update_idletasks()
+        root.update()
 
 def tk_notify(text="1\n2\n3",font=15):
-    QUEUE.send((text,font))
+    CHILD.send((text, font))
 
-def set_queue(queue):
-    global QUEUE
-    QUEUE = queue
+def set_pipe(parent, child):
+    global PARENT, CHILD
+    PARENT = parent
+    CHILD = child
 
 def main():
     tk_notify("bruh")
@@ -186,8 +194,8 @@ def main():
 # known that we wont run tk as main program
 root = tk.Tk()
 root.withdraw()
-QUEUE = None
-NEW_ARGS = None
+PARENT = None  # notifier
+CHILD = None   # caller
 
 if __name__ == '__main__':
     pass
