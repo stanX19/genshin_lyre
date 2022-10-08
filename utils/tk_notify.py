@@ -1,6 +1,6 @@
 import tkinter as tk
-import time
-import threading
+from multiprocessing import Process, Pipe, parent_process
+import sys
 
 def round_rectangle(canvas, x1, y1, x2, y2, radius, **kwargs):
     width = x2 - x1
@@ -155,13 +155,13 @@ class Notification(FadeAway):
                               )
         self.label.place(x=-10,y=-5,)
 
-# def tk_notify(text="1\n2\n3",font=15):
-#     Notifier.notify(text, font)
 
 def notify_mainloop():
+    if not isinstance(ROOT, tk.Tk):
+        raise Exception("root not initiated")
     window = None
     while True:
-        new_args = PARENT.recv()
+        new_args = RECEIVER.recv()
         if new_args == 0:
             pass
         elif new_args[0] is None:
@@ -169,33 +169,54 @@ def notify_mainloop():
         elif new_args != 0:
             if window:  # Not first window / there is a existing window
                 window.destroy()
-                PARENT.recv()
+                extra = RECEIVER.recv()
+                if extra != 0 and extra[0] is None:
+                    return
             window = Notification(*new_args)
-        if window.is_dead:
+        if window and window.is_dead:
             window = None
         else:
-            CHILD.send(0)
-        root.update_idletasks()
-        root.update()
+            SENDER.send(0)
+        ROOT.update_idletasks()
+        ROOT.update()
+
 
 def tk_notify(text="1\n2\n3",font=15):
-    CHILD.send((text, font))
+    if SENDER is None:
+        raise Exception("main program is not called by initiating caller, notification wont work without tk mainloop")
+    SENDER.send((text, font))
 
-def set_pipe(parent, child):
-    global PARENT, CHILD
-    PARENT = parent
-    CHILD = child
 
-def main():
-    tk_notify("bruh")
-    root.after(5000, tk_notify, "am i a joke?")
-    root.after(10000, root.destroy)
+def set_up(target, args, receiver, sender):
+    global RECEIVER, SENDER
+    RECEIVER, SENDER = receiver, sender
+    sys.stdin = open(0)
+    target(*args)
+    tk_notify(None)
+
+
+def initiating_caller(target, args=()):
+    global RECEIVER, SENDER, ROOT
+    ROOT = tk.Tk()
+    ROOT.withdraw()
+    RECEIVER, SENDER = Pipe(False)
+    process = Process(target=set_up,args=(target,args,RECEIVER,SENDER))
+    process.start()
+    notify_mainloop()
+
 
 # known that we wont run tk as main program
-root = tk.Tk()
-root.withdraw()
-PARENT = None  # notifier
-CHILD = None   # caller
+ROOT = None
+RECEIVER, SENDER = None, None
+
+
+def main():
+    import time
+    tk_notify("hahahahah yessss")
+    time.sleep(1)
+    tk_notify("i\nam\nlegend")
+    time.sleep(1)
+
 
 if __name__ == '__main__':
-    pass
+    initiating_caller(main)
