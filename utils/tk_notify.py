@@ -164,7 +164,7 @@ def notify_mainloop():
         new_args = RECEIVER.recv()
         if new_args == 0:
             pass
-        elif new_args[0] is None:
+        elif new_args is None:
             return
         elif new_args != 0:
             if window:  # Not first window / there is a existing window
@@ -192,7 +192,7 @@ def set_up(target, args, receiver, sender):
     RECEIVER, SENDER = receiver, sender
     sys.stdin = open(0)
     target(*args)
-    tk_notify(None)
+    SENDER.send(None)
 
 
 def initiating_caller(target, args=()):

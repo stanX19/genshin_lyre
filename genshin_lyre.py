@@ -59,16 +59,19 @@ def run():
     print("enter song key to play, enter 'help' for details, enter 'i' to exit")
     return user_input_control()
 
-def main():
+def safeloop():
     while True:
         try:
-            initiating_caller(target=run)
+            run()
             break
         except Exception as exc:
             print_cmd_color("darkYellow", f"\nError due to: {exc}\n")
             time.sleep(1)
             print("restarting program...")
             time.sleep(1)
+
+def main():
+    initiating_caller(target=safeloop)
 
 if __name__ == "__main__":
     main()

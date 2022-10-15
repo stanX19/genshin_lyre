@@ -9,6 +9,7 @@ from .unique_name import unique_name
 from .fileopenbox import fileopenbox
 from .user_input_best_match import user_input_best_match
 from .tk_notify import tk_notify, initiating_caller
+from .get_desktop_path import get_desktop_path
 
 notify = tk_notify
 import tk_notify

@@ -1,5 +1,6 @@
 import os, shutil, time
 from pathlib import Path
+from utils import get_desktop_path
 
 def print_cmd_color(color="cyan",text="text"):
     format = f"powershell write-host -fore {color} "
@@ -189,9 +190,7 @@ else:
 
 print("\ncreating shortcut for activation file...")
 
-desktop = os.path.normpath(os.path.expanduser("~/Desktop"))
-if not os.path.exists(desktop):
-    desktop = os.path.join(os.path.join(os.environ['USERPROFILE']), 'OneDrive\\桌面')
+desktop = get_desktop_path()
 shortcut_path = os.path.join(desktop, 'genshin_lyre.lnk')
 target = os.path.join(new_parent_path, 'genshin_lyre.bat')
 icon = os.path.join(new_parent_path, 'genshin_lyre.bat')
@@ -204,7 +203,7 @@ try:
     shortcut.IconLocation = icon
     shortcut.save()
 except Exception as exc:
-    print_cmd_color("DarkYellow","Faliled to create new shortcut, however if you are updating and already have a existing genshin_lyre shortcut you can ignore this")
+    print_cmd_color("DarkYellow",f"Faliled to create new shortcut due to: {exc}\nhowever if you are updating and already have a existing genshin_lyre shortcut you can ignore this")
 
 if os.path.exists(shortcut_path):
 
