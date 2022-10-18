@@ -71,6 +71,10 @@ def safeloop():
             time.sleep(1)
 
 def main():
+    command = os.path.abspath(__file__)
+    if not is_admin():
+        run_as_admin(command)
+        return
     initiating_caller(target=safeloop)
 
 if __name__ == "__main__":
