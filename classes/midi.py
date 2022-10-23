@@ -127,24 +127,22 @@ class Midi:
         return NOTE_KEY
 
     def tune_to_C(self):
-        if hasattr(self,"best_possible"):
+        if hasattr(self, "best_possible"):
             return self.best_possible, self.track_len
-        def sharp_in_notes(notes: list):
-            sharps = [1, 3, 6, 8, 10]
-            total_sharps = 0
-            for note in notes:
-                if note % 12 in sharps:
-                    total_sharps += 1
-            return total_sharps
 
         track = [i.note for i in self.MIdiFile if 'note' in dir(i) and i.type == 'note_on']
         all_possible_major = {}
+        sharps_idx = [1, 3, 6, 8, 10]
+
         for major_idx in range(12):
-            track_note = [i + major_idx for i in track]
-            sharps = sharp_in_notes(track_note)
+            sharps = 0
+            for note in track:
+                if (note + major_idx) % 12 in sharps_idx:
+                    sharps += 1
             all_possible_major[sharps] = major_idx
             if sharps == 0:
                 break
+
         best_possible = list(sorted(all_possible_major))[0]
         offset = all_possible_major[best_possible]
         New_midi = []
@@ -190,9 +188,9 @@ class Midi:
                             stated_note = self.note_keys[msg.note - 1]
                     score_list.append(stated_note)
 
-        while type(score_list[0]) == float:
+        while isinstance(score_list[0], float):
             score_list.pop(0)
-        while type(score_list[-1]) == float:
+        while isinstance(score_list[-1], float):
             score_list.pop(-1)
         return score_list
 
