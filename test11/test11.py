@@ -22,9 +22,16 @@ try:
 except ImportError:
     def send2trash(*wargs, **kwargs):
         print("unable to delete files because module send2trash is misssing")
+try:
+    from ..srcs.controller.export import export_as_nightly
+except ImportError:
+    from srcs.controller.export import export_as_nightly
+
 from converter1 import separate, braket_wrap
+import sectioned_score
 score_path = 'genshin_assets\\scores'
 os.chdir(os.path.dirname(os.path.realpath(__file__)))
+
 class TestPaths:
     test_path = 'genshin_assets\\test\\test.txt'
     settings_path = 'genshin_assets\\test_settings.txt'
@@ -231,41 +238,12 @@ def animuz(test_score):
     finally:
         return '\n'.join(splitted_score)
 
-def format_sectioned_score(score:str,sep="--"):
-    sectioned_score = score.replace("\n","").replace(" ",'-').split("/")
-    new_score = ""
-    for idx, section in enumerate(sectioned_score):
-        section_bucket = []
-        bucket = ""
-        for key in section:
-            if bucket:
-                bucket+=key
-                if key == ")":
-                    section_bucket.append(bucket)
-                    bucket = ""
-            elif key == "(":
-                bucket+=key
-            elif key == "-":
-                section_bucket.append('')
-            else:
-                section_bucket.append(key)
-        if len(section_bucket) <= 4:
-            section_bucket += [''] * (5 - len(section_bucket))
-        else:
-            section_bucket += [''] * (9 - len(section_bucket))
-            # 9 instead of 8 because we are using .join() later, will need an extra character
 
-        cur_sec_score = sep.join(section_bucket)
-        if idx % 2 == 1 and cur_sec_score[-1] == "-":
-                new_score += cur_sec_score[:-1] + "\n"
-        else:
-            new_score += cur_sec_score
-    return new_score
 
 
 def format_score(score:str):
     if score.count("/") > reducLineBreak(score).count("\n"):
-        new_score =  format_sectioned_score(score,sep="--")
+        new_score = sectioned_score.format(score,sep="--")
     else:
         breaked_score = score.splitlines()
         for index, lines in enumerate(breaked_score):
@@ -338,14 +316,20 @@ def main(name="",test_score="",New=False):
         while not keyboard.is_pressed("k"):
             if keyboard.is_pressed("p"):
                 break
-            if keyboard.is_pressed("a") and keyboard.is_pressed("shift") and keyboard.is_pressed("ctrl"):
-                while keyboard.is_pressed("a"):
-                    pass
-                pre_score.append(test_score)
-                test_score = animuz(read_test_txt())
-                with open(TestPaths.test_path, "w+") as f:
-                    f.write(test_score)
-                os.startfile(TestPaths.test_path)
+            if keyboard.is_pressed("shift") and keyboard.is_pressed("ctrl"):
+                if keyboard.is_pressed("a"):
+                    while keyboard.is_pressed("a"):
+                        pass
+                    pre_score.append(test_score)
+                    test_score = animuz(read_test_txt())
+                    with open(TestPaths.test_path, "w+") as f:
+                        f.write(test_score)
+                    os.startfile(TestPaths.test_path)
+                if keyboard.is_pressed("e"):
+                    while keyboard.is_pressed("e"):
+                        pass
+                    export_as_nightly(score=sectioned_score.to_score_list(read_test_txt()), name=input("name? "))
+
             if keyboard.is_pressed("s") and keyboard.is_pressed("n"):
                 add_new_song_to_test()
             if keyboard.is_pressed("z") and keyboard.is_pressed("ctrl"):

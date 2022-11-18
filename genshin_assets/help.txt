@@ -59,6 +59,7 @@ Enter Commands:
 
             Special Key Combinations:
                     Ctrl + Shift + A : edit number of dashes in all lines
+                    Ctrl + Shift + E : export sectioned score as nightly
                     Shift + N : Start/Open current txt
                     N + S : bound mp3 to test score
                     Ctrl + z : Start/open a previous version of the test file (Undo)
