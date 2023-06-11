@@ -17,7 +17,7 @@ def score_list_to_score(score_list):
         average_time = sorted(all_time)[round(len(all_time) / 2)]  # use median
 
     # edit average dashes here: ↓
-    lowest_lim = average_time / 4
+    lowest_lim = average_time / 16
     lowest_time = min([i for i in all_time if i >= lowest_lim])
 
     score = ""

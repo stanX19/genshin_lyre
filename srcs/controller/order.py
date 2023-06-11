@@ -45,6 +45,18 @@ def write(txt):
 def sync():
     write(Songs.songs_order)
 
+
+def autofill():
+    keys_used = set([name.lower() for name in Songs.songs_order])
+
+    for key in Songs.songs:
+        if key.lower() not in keys_used:
+            Songs.songs_order.append(key.lower())
+
+    write(Songs.songs_order)
+
+
+
 def edit(command, song_name=""):
     if Paths.order_path is None:
         if (input("Cannot find scores_order.txt, create new one instead? (Y/n): ")).lower() in ['y', 'yes',
@@ -133,7 +145,9 @@ def edit(command, song_name=""):
                     return None
         return None
 
-    if command == 'order' or 'txt' in command:
+    if command == 'order' or 'txt' in command or 'autofill' in command:
+        if 'autofill' in command:
+            autofill()
         if Paths.order_path is not None:
             os.startfile(Paths.order_path)
 

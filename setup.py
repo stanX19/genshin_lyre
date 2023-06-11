@@ -7,7 +7,7 @@ def print_cmd_color(color="cyan",text="text"):
     text = text.replace("(","[").replace(")","]").replace(";",".")
     for i in text.split("\n"):
         if os.system(format+i):
-            raise OSError("couldn't connect to powershell")
+            raise OSError("failed to call powershell")
 
 
 if "PycharmProjects" in os.path.realpath(__file__):

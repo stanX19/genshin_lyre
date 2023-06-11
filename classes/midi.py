@@ -1,14 +1,16 @@
-from mido import MidiFile
+import math
+import time
 from functools import cached_property
-from data import *
+
 import keyboard
 import pyautogui
-import time
-import math
+from config_data import *
+from mido import MidiFile
+
 try:
-    from ...utils import *
+    from ... import utils
 except ImportError:
-    from utils import *
+    import utils
 
 
 class Midi:
@@ -17,7 +19,10 @@ class Midi:
         if midi_path.endswith(".mid"):
             self.path = midi_path
             self.name = name
-            self._MIdiFile = None
+            self.track_len = 0
+            self.best_possible = []
+            self._is_tuned_to_c = False
+            self._midi_file = None
         else:
             raise ValueError(f"Expecting midi file type, got '.{midi_path.split('.')[-1]}' file type instead\n")
 
@@ -28,7 +33,7 @@ class Midi:
             song_length = f"{math.floor(total_length / 60)}m {round(total_length % 60)}s"
         else:
             song_length = f"{round(total_length)}s"
-        lowest_sharp, total_key = self.tune_to_C()
+        lowest_sharp, total_key = self.tune_to_c()
         percentage = round(lowest_sharp / total_key * 100, 1)
         if lowest_sharp > 0:
             suitability = f"lowest sharp is {lowest_sharp} out of {total_key} keys"
@@ -42,30 +47,36 @@ class Midi:
       LENGTH      : {song_length}
       SUITABILITY : {suitability}
     """
+
     @property
-    def MIdiFile(self):
-        if not self._MIdiFile:
-            self._MIdiFile = [i for i in MidiFile(self.path) if not i.is_meta]
-            self.tune_to_C()
-        return self._MIdiFile
-    @MIdiFile.setter
-    def MIdiFile(self,val):
-        self._MIdiFile = val
+    def midi_file(self):
+        if not self._midi_file:
+            self._midi_file = [i for i in MidiFile(self.path)]
+            self.tune_to_c()
+        return self._midi_file
+
+    @midi_file.setter
+    def midi_file(self, val):
+        self._midi_file = val
+
     @cached_property
     def score(self):
         return self.raw_keys
+
     @cached_property
     def raw_keys(self):
-        self.tune_to_C()
-        return score_list_to_score(self.to_score_list())
+        self.tune_to_c()
+        return utils.score_list_to_score(self.to_score_list())
+
     @cached_property
     def score_list(self):
-        self.tune_to_C()
+        self.tune_to_c()
         return self.to_score_list()
+
     @cached_property
     def note_keys(self):
         """notes range finding, minimum sharp will still be high for unsuitable score"""
-        midi = self.MIdiFile
+        midi = self.midi_file
         LINE1 = ['Z', 'X', 'C', 'V', 'B', 'N', 'M']
         LINE2 = ['A', 'S', 'D', 'F', 'G', 'H', 'J']
         LINE3 = ['Q', 'W', 'E', 'R', 'T', 'Y', 'U']
@@ -118,7 +129,7 @@ class Midi:
             NOTES.append(index)
             index += i
 
-        # filling in LYRE_KEYS (range), low row and lower + mid row + high row and higher
+        # filling in LYRE_KEYS (range), low row and lower + mid-row + high row and higher
         low_row = int((middle_row_start - lowest_row_start) / 12)
         high_row = int((highest_row_start - middle_row_start) / 12)
         LYRE_KEYS = LINE1 * low_row + LINE2 + LINE3 * high_row
@@ -126,11 +137,11 @@ class Midi:
         NOTE_KEY = dict(zip(NOTES, LYRE_KEYS))
         return NOTE_KEY
 
-    def tune_to_C(self):
-        if hasattr(self, "best_possible"):
+    def tune_to_c(self):
+        if self._is_tuned_to_c:
             return self.best_possible, self.track_len
 
-        track = [i.note for i in self.MIdiFile if 'note' in dir(i) and i.type == 'note_on']
+        track = [i.note for i in self.midi_file if 'note' in dir(i) and i.type == 'note_on']
         all_possible_major = {}
         sharps_idx = [1, 3, 6, 8, 10]
 
@@ -146,20 +157,19 @@ class Midi:
         best_possible = list(sorted(all_possible_major))[0]
         offset = all_possible_major[best_possible]
         New_midi = []
-        for msg in self.MIdiFile:
+        for msg in self.midi_file:
             if 'note' in dir(msg):
                 msg.note += offset
             New_midi.append(msg)
         self.best_possible = best_possible
         self.track_len = len(track)
-        self.MIdiFile = New_midi
+        self.midi_file = New_midi
         return self.best_possible, len(track)
 
     def to_score_list(self):
-        midi = self.MIdiFile
+        midi = self.midi_file
         score_list = [0.0]
         for idx, msg in enumerate(midi):
-            # if msg.is_meta: continue
             if msg.time > 0.0:
                 try:
                     score_list[-1] += msg.time
@@ -194,11 +204,9 @@ class Midi:
             score_list.pop(-1)
         return score_list
 
-    def play(self, waitForK=False):
+    def play(self):
         pyautogui.PAUSE = 0
-        self.tune_to_C()
-        if waitForK:
-            keyboard.wait("k")
+        self.tune_to_c()
 
         # to score
         score_list = self.to_score_list()
@@ -213,18 +221,27 @@ class Midi:
             if keyboard.is_pressed("left"):
                 while keyboard.is_pressed("left"):
                     pass
-                PlayVaria.song_index -= 50 if PlayVaria.song_index > 49 else 0
+                PlayVaria.song_index = PlayVaria.song_index - 50 if PlayVaria.song_index > 49 else 0
                 continue
             if keyboard.is_pressed("right"):
                 time.sleep(0.01)
             else:
                 if type(msg) == float:
-                    fixed_time += msg/PlayVaria.speed  # time that should've pass
+                    fixed_time += msg / PlayVaria.speed  # time that should've pass
                 actual_playback_time = time.time() - start_time
                 duration_to_next_event = fixed_time - actual_playback_time
                 # to cancel out any delay
                 if duration_to_next_event > 0.0:
-                    time.sleep(duration_to_next_event)
+                    _stop_waiting = time.time() + duration_to_next_event
+                    while time.time() < _stop_waiting:
+                        time.sleep(0.001)
+                        for key in ["shift", "left", "right"]:
+                            if keyboard.is_pressed(key):
+                                break
+                        else:
+                            continue
+                        break
+                    # time.sleep(duration_to_next_event)
                 elif duration_to_next_event < threshold:
                     start_time = time.time() - fixed_time + threshold
 

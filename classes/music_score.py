@@ -3,8 +3,8 @@ import pyautogui
 import time
 import re
 import math
+from config_data import *
 from bisect import bisect_right, bisect_left
-from data import *
 
 
 class old_music_score():

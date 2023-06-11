@@ -1,14 +1,20 @@
 import json
-import keyboard
-import pyautogui
-import time
 import math
-from utils import score_list_to_score
-from data import *
+import time
 from functools import cached_property
 
+import keyboard
+import pyautogui
+from config_data import *
+
+try:
+    from ... import utils
+except ImportError:
+    import utils
+
+
 class Nightly():
-    def __init__(self,text: str, name=""):
+    def __init__(self, text: str, name=""):
         try:
             with open(text, encoding="utf-8") as f:
                 text = json.load(f)[0]
@@ -39,7 +45,7 @@ class Nightly():
                 temp_store = "".join(set(temp_store))  # kill repeat
                 self.score_list.append(temp_store)
                 self.score_list.append(0.0)
-            self.score_list[-1] += beat / (data[0]+1)
+            self.score_list[-1] += beat / (data[0] + 1)
 
     def __str__(self):
         total_length = sum([val for val in self.score_list if isinstance(val, float)])
@@ -56,9 +62,10 @@ class Nightly():
     @property
     def raw_keys(self):
         return self.score
+
     @cached_property
     def score(self):
-        return score_list_to_score(self.score_list)
+        return utils.score_list_to_score(self.score_list)
 
     def play(self, waitForK=False):
         pyautogui.PAUSE = 0
@@ -88,7 +95,16 @@ class Nightly():
                 duration_to_next_event = fixed_time - actual_playback_time
                 # to cancel out any delay
                 if duration_to_next_event > 0.0:
-                    time.sleep(duration_to_next_event)
+                    _stop_waiting = time.time() + duration_to_next_event
+                    while time.time() < _stop_waiting:
+                        time.sleep(0.001)
+                        for key in ["shift", "left", "right"]:
+                            if keyboard.is_pressed(key):
+                                break
+                        else:
+                            continue
+                        break
+                    # time.sleep(duration_to_next_event)
                 elif duration_to_next_event < threshold:
                     start_time = time.time() - fixed_time + threshold
 

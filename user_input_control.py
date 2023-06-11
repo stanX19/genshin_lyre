@@ -53,6 +53,7 @@ def user_input_control(enter=''):
                     "txt":Paths.test_path,
                     "scores": Paths.test_path,
                     "nightly":Paths.nightly_path,
+                    "json": Paths.nightly_path,
                 }
                 if "all" in enter:
                     print("\n".join(list(Songs.songs)))
@@ -94,7 +95,7 @@ def user_input_control(enter=''):
                     except FileNotFoundError as exc:
                         print(f"An error occured while reading help.txt: {exc}")
                 else:
-                    print("Help.txt is not availabe")
+                    print("Help.txt is missing")
                 no_result = False
             elif 'record' in enter:
                 with open('record.py', "r") as record:
@@ -255,11 +256,12 @@ def user_input_control(enter=''):
                         print(f"""    song index is out of range, maximum index is {len(Songs.songs)}""")
 
                 no_result = False
+
             elif 'midi' in enter:
                 if 'new' in enter:
                     new_midi()
                 else:
-                    os.startfile(Paths.mid_path)
+                    print("Did you mean [midi list]?")
                 no_result = False
 
             elif "test" in enter or 'new' in enter or "edit" in enter:

@@ -11,18 +11,18 @@ def notify_current_song(song_idx):
 
 def play_song(song_idx):
     print(f"currently playing: {list(Songs.songs.keys())[song_idx]} ({song_idx + 1})")
+    # if Settings.notification:
+    #     current_song = list(Songs.songs.keys())[song_idx]
+    #     try:
+    #         next_song = list(Songs.songs.keys())[song_idx + 1]
+    #     except IndexError:
+    #         next_song = list(Songs.songs.keys())[0]
+    #     try:
+    #         last_song = list(Songs.songs.keys())[song_idx - 1]
+    #     except IndexError:
+    #         last_song = list(Songs.songs.keys())[len(Songs.songs) - 1]
     if Settings.notification:
-        current_song = list(Songs.songs.keys())[song_idx]
-        try:
-            next_song = list(Songs.songs.keys())[song_idx + 1]
-        except IndexError:
-            next_song = list(Songs.songs.keys())[0]
-        try:
-            last_song = list(Songs.songs.keys())[song_idx - 1]
-        except IndexError:
-            last_song = list(Songs.songs.keys())[len(Songs.songs) - 1]
-        if Settings.notification:
-            notify_current_song(song_idx)
+        notify_current_song(song_idx)
     # time.sleep(1)
     pyautogui.click(Settings.genshin_app_coordinate)
     last_action = time.time()
