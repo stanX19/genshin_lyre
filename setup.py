@@ -121,8 +121,8 @@ if os.path.exists(destination_path) and str(parent_path) != str(destination_path
         shutil.move(user_scores_order_path, imported_scores_order)
 
     # preserving user settings
-    user_settings_path = os.path.join(destination_path, "app\\genshin_assets\\settings.txt")
-    imported_settings_path = os.path.join(current_path, "genshin_assets\\settings.txt")
+    user_settings_path = os.path.join(destination_path, "app\\genshin_assets\\settings.json")
+    imported_settings_path = os.path.join(current_path, "genshin_assets\\settings.json")
     os.remove(imported_settings_path)
     shutil.move(user_settings_path, imported_settings_path)
 
@@ -210,11 +210,11 @@ if os.path.exists(shortcut_path):
     print_cmd_color("cyan",f"""+-----------------------------------------------------------------------------------------------------------------------
 ...                Shortcut formed at {shortcut_path}                
              
-...        Everything is configured, now you just need to right-click the shortcut on your desktop, and choose:
+...        Everything is configured, you can choose to right-click the shortcut on your desktop, and choose:
 """)
     print("""               Properties --> Advanced --> and check 'Run As Administrator' --> ok --> ok""")
     print_cmd_color("cyan","""  
-...                This is to let the program run over genshin impact
+...                This is to let the program start at adminstrator level
 +-----------------------------------------------------------------------------------------------------------------------
 """)
 
@@ -231,10 +231,10 @@ f"""+---------------------------------------------------------------------------
 ...            After you create your shortcut now you just need to rigitclick the shortcut on your desktop, and choose:
 """)
     else:
-        print_cmd_color("cyan","...        Everything is configured, now you just need to right-click the shortcut on your desktop, and choose:\n")
+        print_cmd_color("cyan","...        Everything is configured, you can choose to right-click the shortcut on your desktop, and choose:\n")
     print("""               Properties --> Advanced --> and check 'Run As Administrator' --> ok --> ok""")
     print_cmd_color("cyan","""
-...            This is to let the program run over genshin impact
+...            This is to let the program start at adminstrator level
 +-----------------------------------------------------------------------------------------------------------------------
 """)
 

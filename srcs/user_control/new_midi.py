@@ -49,7 +49,7 @@ def import_midi(midi_path, quiet=False):
         new_midi = Midi(midi_path)
         name = midi_path.replace("/", "\\").split("\\")[-1].replace(".mid", "")
         print(f"File found: '{midi_path}'")
-        lowest_sharp, total_key = new_midi.tune_to_C()
+        lowest_sharp, total_key = new_midi.tune_to_c()
         percentage = round(lowest_sharp / total_key * 100, 1)
         print("  Processing complete, ", end='')
         if lowest_sharp > 0:
@@ -105,6 +105,7 @@ def new_midi():
         return 0
     if len(paths) == 1:
         midi_or_nightly(paths[0])
+        return
 
     for path in paths:
         midi_or_nightly(path, quiet=True)

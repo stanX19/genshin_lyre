@@ -14,7 +14,6 @@ except ImportError:
 
 
 class Midi:
-
     def __init__(self, midi_path: str, name=""):
         if midi_path.endswith(".mid"):
             self.path = midi_path
@@ -75,7 +74,7 @@ class Midi:
 
     @cached_property
     def note_keys(self):
-        """notes range finding, minimum sharp will still be high for unsuitable score"""
+        """notes range finding, minimum sharp will still be high for unsuitable midi"""
         midi = self.midi_file
         LINE1 = ['Z', 'X', 'C', 'V', 'B', 'N', 'M']
         LINE2 = ['A', 'S', 'D', 'F', 'G', 'H', 'J']
@@ -86,12 +85,12 @@ class Midi:
         midi_notes = sorted([i.note for i in midi if hasattr(i, 'note') and i.type == "note_on"])
 
         # min and max
-        max_midi_note = max(midi_notes)
-        min_midi_note = min(midi_notes)
+        max_midi_note = midi_notes[-1]
+        min_midi_note = midi_notes[0]
         lowest_row_start = min_midi_note - min_midi_note % 12
         highest_row_start = max_midi_note - max_midi_note % 12
 
-        if highest_row_start - lowest_row_start <= 24:
+        if highest_row_start - lowest_row_start <= 24:  # small range of data
             middle_row_start = lowest_row_start + 12
         else:
             # quartile
@@ -141,27 +140,35 @@ class Midi:
         if self._is_tuned_to_c:
             return self.best_possible, self.track_len
 
-        track = [i.note for i in self.midi_file if 'note' in dir(i) and i.type == 'note_on']
-        all_possible_major = {}
+        track = [i.note for i in self.midi_file if hasattr(i, 'note') and i.type == 'note_on']
         sharps_idx = [1, 3, 6, 8, 10]
 
+        all_types = {i: 0 for i in range(12)}
+        for note in track:
+            all_types[note % 12] += 1
+
+        best_possible_major = 0
+        min_sharps = float('inf')
+
         for major_idx in range(12):
-            sharps = 0
-            for note in track:
-                if (note + major_idx) % 12 in sharps_idx:
-                    sharps += 1
-            all_possible_major[sharps] = major_idx
+            sharps = sum(all_types[(idx - major_idx) % 12] for idx in sharps_idx)
+
             if sharps == 0:
+                best_possible_major = major_idx
+                min_sharps = sharps
                 break
 
-        best_possible = list(sorted(all_possible_major))[0]
-        offset = all_possible_major[best_possible]
+            if sharps < min_sharps:
+                best_possible_major = major_idx
+                min_sharps = sharps
+
+        offset = best_possible_major
         New_midi = []
         for msg in self.midi_file:
             if 'note' in dir(msg):
                 msg.note += offset
             New_midi.append(msg)
-        self.best_possible = best_possible
+        self.best_possible = min_sharps
         self.track_len = len(track)
         self.midi_file = New_midi
         return self.best_possible, len(track)
@@ -248,3 +255,4 @@ class Midi:
             if type(msg) == str:
                 pyautogui.typewrite(msg)
             PlayVaria.song_index += 1
+
