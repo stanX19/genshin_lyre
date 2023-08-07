@@ -1,15 +1,15 @@
 {
   "genshin_app_coordinate": [
-    875,
-    1049
+    813,
+    1045
   ],
   "pyautoguiFAILSAFE": false,
-  "notification": false,
+  "notification": true,
   "follow_order": true,
   "midi_include_sharps": true,
   "midi_beat_threshold": 0,
   "midi_offset": 0,
-  "name_max_length": 25,
+  "name_max_length": 30,
   "search_break_weight_ratio": 1.0,
   "search_max_missing": 0
 }

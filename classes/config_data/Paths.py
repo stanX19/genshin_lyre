@@ -1,8 +1,5 @@
 import os
-try:
-    from ...utils import get_desktop_path
-except ImportError:
-    from utils import get_desktop_path
+from utils import get_system_path, CSIDL_List, get_windows_downloads_path
 
 #dirs
 nightly_path = 'genshin_assets\\nightly'
@@ -17,9 +14,14 @@ order_path = 'genshin_assets\\scores_order.txt'
 settings_path = 'genshin_assets\\settings.json'
 help_path = 'genshin_assets\\help.txt'
 export_paths = []
-desktop_path = get_desktop_path()
+desktop_path = get_system_path(CSIDL_List.CSIDL_DESKTOP)
+downloads_path = get_windows_downloads_path()
 
 nightly_website = 'genshin_assets\\Genshin Music Nightly.url'
+
+# exe
+notepad_path = "notepad.exe"
+
 # add new types of file directory and its file extension here:
 file_type = {nightly_path: 'json',
              score_path: 'txt',

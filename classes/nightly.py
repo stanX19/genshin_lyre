@@ -13,19 +13,30 @@ except ImportError:
     import utils
 
 
-class Nightly():
-    def __init__(self, text: str, name=""):
-        try:
-            with open(text, encoding="utf-8") as f:
-                text = json.load(f)[0]
-            notes = text['columns']
-        except Exception:
-            raise Exception('The given text is not a Genshin nightly file')
-        try:
-            bpm = text["bpm"]
-        except KeyError:
-            raise Exception('Cannot process recorded version of nightly file')
+class Nightly:
+    def __init__(self, path: str, name=""):
+        self.path = path
         self.name = name
+        self.score_list = []
+        try:
+            with open(path, encoding="utf-8") as f:
+                json_data = json.load(f)[0]
+            self.is_composed = json_data["data"]['isComposedVersion']
+        except Exception as exc:
+            raise Exception(f'The given text is not a Genshin nightly file path, missing key: {exc}')
+
+        if self.is_composed:
+            self.init_as_composed(json_data)
+        else:
+            self.init_as_recorded(json_data)
+
+    def init_as_composed(self, json_data):
+        try:
+            bpm = json_data["bpm"]
+            notes = json_data["columns"]
+        except KeyError as exc:
+            raise Exception(f"Missing key for composed genshinsheet score: {exc}")
+
         KEYS = ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'A', 'S', 'D', 'F', 'G', 'H', 'J', 'Z', 'X', 'C', 'V', 'B', 'N', 'M']
         NOTES = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
         NOTE_KEY = dict(zip(NOTES, KEYS))
@@ -47,6 +58,26 @@ class Nightly():
                 self.score_list.append(0.0)
             self.score_list[-1] += beat / (data[0] + 1)
 
+    def init_as_recorded(self, json_data):
+        try:
+            notes = json_data["notes"]
+        except KeyError as exc:
+            raise Exception(f"Missing key for recorded genshinsheet score: {exc}")
+
+        KEYS = ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'A', 'S', 'D', 'F', 'G', 'H', 'J', 'Z', 'X', 'C', 'V', 'B', 'N', 'M']
+        NOTES = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
+        NOTE_KEY = dict(zip(NOTES, KEYS))
+
+        previous_time = 0.0
+        self.score_list = []
+        for note in notes:
+            key = NOTE_KEY[note[0]]
+            play_time = note[1] / 1000
+            delay = play_time - previous_time
+            self.score_list += [delay, key]
+
+            previous_time = play_time
+
     def __str__(self):
         total_length = sum([val for val in self.score_list if isinstance(val, float)])
         if total_length > 60:
@@ -57,6 +88,7 @@ class Nightly():
       TYPE        : nightly score
       SAVED AS    : {self.name}.json
       LENGTH      : {song_length}
+      FORMAT      : {"composed" if self.is_composed else "recorded"}
                 """
 
     @property
@@ -74,6 +106,10 @@ class Nightly():
 
         # to score
         score_list = self.score_list
+
+        while isinstance(score_list[0], float):
+            score_list.pop(0)
+
         start_time = time.time()
         threshold = Settings.midi_beat_threshold
         fixed_time = 0.0

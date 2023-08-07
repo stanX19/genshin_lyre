@@ -1,0 +1,106 @@
+(XNAD)  /      /      /      /
+(XNAF)  /      /      /      /
+(XNSG)  /      /      /      /
+(XBS)  /  B /      /B   /
+
+B   /  B /  B /B (XBG) /
+
+(ZDGW)  /  (ZDQ) /      /(ZDG)  /
+(ZD) E /  (ZD) /      /(ZD) Q /
+(BMSW)  /  (BSQ) /      /(BSG)  /
+(BD)  /  (BS) /      /(XB) G /
+
+(NADW)  /  (NDQ) /      /(NDG)  /
+(ND) E /  (ND) /      /(NS) Q /
+(BSW)  /  (BSE) /      /(BSQ)  /
+(BS) G /  (BA) /      /(XB) G /
+
+(VADT)  /  (VAQ) /      /(VAW)  /
+(VA) Q /  (VA) /      /(ZV) G /
+(CBST)  /Q (CSQ) /  W /(CSW)  /
+(CS) E /  (CSW) /  EW/(CBQ)  /
+
+(XNDW)  /  (XNQ) /      /(XNG)  /
+(XN) E /  (XN) /Q   /(XNJ)  /
+(BSQ)  /J (BSQ) /  W /(BSW)  /
+(BSR)EWQ /JH(BSG)F /GHJQ /(BSW)ERT /
+
+      /  (XB) /(XB) (XB) /(XB) (XBG) /
+
+(ZBDW)  /  (ZDQ) /      /(ZDG)  /
+(ZD) E /  (ZD) /      /(ZDQ)  /
+(XBMW)  /  (BSQ) /      /(BSG)  /
+(BD)  /  (BS) /      /(XB) G /
+
+(CNAW)  /  (NDQ) /      /(NDG)  /
+(ND) E /  (ND) /      /(NS) T /
+(XBGT)  /  (BSQ) /      /(BS) G /
+(BSG)  /  (BA) /      /(XBG)  /
+
+(ZVNT)  /  (VAQ) /      /(VAW)  /
+(VA) Q /  (VA) /      /(VAQ)WER /
+(CBST)  /Q (CSQ) /  W /(CSW)  /
+(CS) E /  (CSW) /  EW/(CBQ)  /
+
+(XNDW)  /  (XNQ) /      /(XNG)  /
+(XN) E /  (XNW) /      /(XNQ)  /
+(BST) W /Q (BST) /W Q /(BST) W /
+(BSQ) U /T (BSW) /W U /(BST) (BW) /
+
+(NE) C /M A /(GQ) S /A C /
+(NJ) C /M A /S A /(MQ) N /
+(CG) B /M S /G S /M B /
+C B /M S /G S /(MD) B /
+
+(VG) Z /N A /(GQ) A /N Z /
+(VW) Z /N A /D A /(NQ) V /
+(ZE) B /A D /G D /S A /
+(BW) X /M S /(GQ) S /(MJ) B /
+
+(NQ) C /M A /(GT) S /A C /
+(NQ) C /M A /(GJ) A /M N /
+(CJ) B /M S /(GT) S /M B /
+(CJ) B /M S /(DG) S /M B /
+
+(VH) Z /N A /D A /N Z /
+(VQ) Z /N A /D A /N V /
+(BW) X /B M /S M /B X /
+(BE) X /B M /S M /B X /
+
+(VQ) Z /N A /D A /N Z /
+(VT) Z /N A /D A /N Z /
+(BW) X /M S /(GE) S /M B /
+(BT) X /M S /(BU) S /G J /
+
+(VAY)  /      /T   /      /
+(BSE)  /  TE/W   /Q   /
+(NDW)  /E   /H   /G   /
+H   /      /(BSH)  /Q   /
+
+(VAY)  /      /T   /      /
+(BSE)  /  TE/W   /Q   /
+(NW)  /(CE)  /(AT)  /(DY)  /
+(BE)  /X   /(MH)  /X   /
+
+(VY)  /A   /(DT)  /A   /
+(BE)  /S TE/(GW)  /(SQ)  /
+(NW)  /(CE)  /(AT)  /(DY)  /
+(BSQ)  /      /(XBY)  /T   /
+
+(XNDH)  /  (XN) /E   /(XN)  /
+(CMGW)  /  (CM) /T   /(CMW)  /
+(VADE)  /  (VA) /Y   /(VA)  /
+(BSGU)  /  (BS) /      /(BS)  /
+
+(BSQ)  /  (BS) /      /(BS)  /
+(XBW)  /      /      /      /
+
+(VAY)  /      /T   /
+(BSE)  /  TE/W   /Q   /
+      /      /(VASQE) /      /      /
+
+
+
+
+
+

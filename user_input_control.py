@@ -1,6 +1,7 @@
 from srcs import *
 from utils import *
 from classes import *
+from song_editor import *
 import pathlib
 #from collections import Counter
 try:
@@ -273,10 +274,6 @@ def user_input_control(enter=''):
                     TEST_SCORE = selected_song.score
                     if type(selected_song) == old_music_score:
                         TEST_SCORE = "-".join(selected_song.raw_key_list)
-
-                    print("switched to test session, any changes here wont affect the original song")
-                    print(
-                        "if you want to access this test score again, just enter 'test' followed by its file number to open it\n")
                 else:
                     if "test" in enter:
                         NAME = enter.replace("test", "").strip()
@@ -284,7 +281,13 @@ def user_input_control(enter=''):
                     else:
                         NAME = ""
                     TEST_SCORE = ""
-                test_session(NAME, TEST_SCORE, NEW)
+
+                if isinstance(selected_song, Nightly) and not selected_song.is_composed:
+                    interactable_edit_recorded_json(selected_song)
+                else:
+                    print("switched to test session, any changes here wont affect the original song")
+                    print("if you want to access this test score again, just enter 'test' followed by its file number to open it\n")
+                    test_session(NAME, TEST_SCORE, NEW)
                 no_result = False
 
             elif 'set' in enter.split():

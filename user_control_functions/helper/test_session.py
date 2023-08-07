@@ -2,13 +2,13 @@ try:
     from ...classes import *
 except ImportError:
     from classes import *
-import test11
+import song_editor
 import controller
 from send2trash import send2trash
 
 
 def test_session(name="", score="", new=False):
-    test_score = test11.main(name, score, new)
+    test_score = song_editor.main(name, score, new)
     while input("add to saved? (yes/no): ") == 'yes':
         name = input("name? ").lower()
         name = name if name != "" else "Atest_score"

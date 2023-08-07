@@ -1,6 +1,6 @@
 import os, shutil, time
 from pathlib import Path
-from utils import get_desktop_path
+from utils import get_system_path
 
 def print_cmd_color(color="cyan",text="text"):
     format = f"powershell write-host -fore {color} "
@@ -190,7 +190,7 @@ else:
 
 print("\ncreating shortcut for activation file...")
 
-desktop = get_desktop_path()
+desktop = get_system_path(CSIDL_List.CSIDL_DESKTOP)
 shortcut_path = os.path.join(desktop, 'genshin_lyre.lnk')
 target = os.path.join(new_parent_path, 'genshin_lyre.bat')
 icon = os.path.join(new_parent_path, 'genshin_lyre.bat')

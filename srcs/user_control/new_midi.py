@@ -1,5 +1,8 @@
 import os
 import shutil
+
+import Paths
+
 try:
     import controller
     import test_session
@@ -99,7 +102,7 @@ def midi_or_nightly(path, quiet=False):
 
 
 def new_midi():
-    paths = fileopenbox(title="Open", msg="Select files to be imported", default=Paths.desktop_path+'\\\\', multiple=True)
+    paths = fileopenbox(title="Open", msg="Select files to be imported", default=Paths.downloads_path+"\\", multiple=True)
     if not paths:
         print("  Cancelled")
         return 0
