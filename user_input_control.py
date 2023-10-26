@@ -267,6 +267,7 @@ def user_input_control(enter=''):
 
             elif "test" in enter or 'new' in enter or "edit" in enter:
                 NEW = True  # if not 'test' in enter / if 'new' in enter or 'edit' in enter
+                selected_song = None
 
                 if no != [] and int(no[0]) <= len(Songs.songs.keys()) and "edit" in enter:
                     selected_song = list(Songs.songs.values())[int(no[0]) - 1]

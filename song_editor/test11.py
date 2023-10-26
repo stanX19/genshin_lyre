@@ -39,7 +39,17 @@ class TestPaths:
 class TestSettings:
     song_library = {}
     selected_song = None
-    
+
+
+def replace_unknown_characters_with_space(input_string):
+    # Define a regular expression pattern to match any character that is not a printable ASCII character
+    pattern = r'[^\x20-\x7E]'
+
+    # Use the sub method to replace all matched characters with spaces
+    cleaned_string = re.sub(pattern, ' ', input_string)
+
+    return cleaned_string
+
 def read_song_lib():
     try:
         with open(TestPaths.settings_path, encoding="utf-8") as f:
@@ -215,6 +225,7 @@ def reducLineBreak(the_string: str):
 def read_test_txt():
     with open(TestPaths.test_path, "r+", encoding="utf-8") as f:
         score = reducLineBreak(f.read().strip())
+    score = replace_unknown_characters_with_space(score)
     return score
 
 def animuz(test_score):

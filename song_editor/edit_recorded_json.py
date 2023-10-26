@@ -37,13 +37,65 @@ def split_keys(text: str) -> list:
     return keys
 
 
-def find_removed_keys(original_score: str, edited_score: str) -> list[int]:
-    matcher = difflib.SequenceMatcher(None, original_score, edited_score)
+def longest_equal(old, new):
+    if new in old:
+        return [[old.find(new), old.find(new) + len(new), 0, len(new)]]
+
+    data = [[[]] * (len(old) + 1) for _ in range(len(new) + 1)]  # data[new][old] = [[start_idx, end_idx]] + conseq
+    count = [[[]] * (len(old) + 1) for _ in range(len(new) + 1)]  # count[new][old] = char_count [int]
+
+    for new_idx in range(len(new) - 1, -1, -1):
+        data[new_idx][len(old)] = data[new_idx + 1][0]
+        count[new_idx][len(old)] = count[new_idx + 1][0]
+        for old_idx in range(len(old) - 1, -1, -1):
+            if not new[new_idx] == old[old_idx]:
+                data[new_idx][old_idx] = data[new_idx][old_idx + 1]
+                count[new_idx][old_idx] = count[new_idx][old_idx + 1]
+                continue
+
+            i, j = new_idx, old_idx
+            while i < len(new) and j < len(old) and new[i] == old[j]:
+                i += 1
+                j += 1
+
+            char_count = sorted([i - new_idx] + count[i][j], reverse=True)
+            if char_count >= count[new_idx][old_idx + 1]:
+                count[new_idx][old_idx] = char_count
+                data[new_idx][old_idx] = [[old_idx, j, new_idx, i]] + data[i][j]
+            else:
+                count[new_idx][old_idx] = count[new_idx][old_idx + 1]
+                data[new_idx][old_idx] = data[new_idx][old_idx + 1]
+
+    return data[0][0]
+
+
+def generate_opcodes(old, new):
+    lcs_data = longest_equal(old, new)
+    opcodes = []
+
+    old_idx = 0
+
+    for start_old, end_old, start_new, end_new in lcs_data:
+        if old_idx < start_old:
+            opcodes.append(('delete', old_idx, start_old))
+
+        opcodes.append(('equal', start_old, end_old))
+        old_idx = end_old
+
+    if old_idx < len(old):
+        opcodes.append(('delete', old_idx, len(old)))
+
+    return opcodes
+
+
+def find_removed_keys(original_score: str, opcodes) -> list[int]:
+    # matcher = difflib.SequenceMatcher(None, original_score, edited_score)
 
     cur_idx = 0
     removed_keys_indices = []
 
-    for op in matcher.get_opcodes():
+    for op in opcodes:  # matcher.get_opcodes():
+        print(op)
         involved_keys = split_keys(original_score[op[1]: op[2]])
         if op[0] == 'delete':
             for idx in range(len(involved_keys)):
@@ -98,6 +150,8 @@ def save_changes(nightly_song: classes.Nightly, new_score_list: list):
     NOTES = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
     KN = dict(zip(KEYS, NOTES))
 
+    nightly_song.score_list = new_score_list
+
     notes = []
     cum_time = 100
     for val in new_score_list:
@@ -127,7 +181,8 @@ def edit_recorded_json(nightly_song: classes.Nightly) -> bool:
 
     if edited_score == original_score:
         return False
-    to_remove = find_removed_keys(original_score, edited_score)
+    opcodes = generate_opcodes(original_score, edited_score)
+    to_remove = find_removed_keys(original_score, opcodes)
     new_score_list = remove_keys_by_index(nightly_song.score_list, to_remove)
 
     save_changes(nightly_song, new_score_list)
@@ -153,23 +208,27 @@ def interactable_edit_recorded_json(nightly_song: classes.Nightly):
         print("        No changes made")
         return
 
-    to_remove = find_removed_keys(original_score, edited_score)
+    opcodes = generate_opcodes(original_score, edited_score)
+    to_remove = find_removed_keys(original_score, opcodes)
     new_score_list = remove_keys_by_index(nightly_song.score_list, to_remove)
 
     print(utils.score_list_to_score(new_score_list))
-    print(f"new version removed keys with index: {to_remove}")
+    print(f"changes:")
+    for op in opcodes:
+        print(f"    {op}")
     confirmed = utils.get_confirmation()
 
     if confirmed:
-        print(f"       Changes saved to {nightly_song.name}")
+        save_changes(nightly_song, new_score_list)
+        print(f"    Changes saved to {nightly_song.name}")
     else:
-        print("        Changes discarded")
+        print("    Changes discarded")
 
 
 def main():
-    path = utils.fileopenbox(title="Open", msg="Select files to be imported", default=Paths.downloads_path+'\\\\', multiple=True)
-    song = classes.Nightly(path, "gou zhi qi shi")
-    edit_recorded_json(song)
+    path = utils.fileopenbox(title="Open", msg="Select files to be imported", default=Paths.downloads_path+'\\\\', multiple=True)[0]
+    song = classes.Nightly(path, path)
+    interactable_edit_recorded_json(song)
 
 
 if __name__ == '__main__':

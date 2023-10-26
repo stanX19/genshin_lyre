@@ -8,7 +8,7 @@ except ImportError:
 
 def score_list_to_score(score_list):
     all_keys = "ZXCVBNMASDFGHJQWERTYUzxcvbnmasdfghjqwertyu"
-    all_time = [i for i in score_list if type(i) == float]
+    all_time = [i for i in score_list if type(i) == float and i > 0.0]
     try:
         average_time = statistics.mode(all_time) #mode
     except statistics.StatisticsError: #if no mode or 2 mode
