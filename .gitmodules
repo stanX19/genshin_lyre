@@ -1,0 +1,5 @@
+[submodule "lyre_mp4_to_score"]
+	path = lyre_mp4_to_score
+	url = https://github.com/stanX19/lyre_mp4_to_score.git
+	branch = main
+

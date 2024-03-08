@@ -129,8 +129,6 @@ def smplify(enter=""):
         if multikey == True:  # in bracket
             if enter[i] == ")":  # end of bracket
 
-                # test subject
-
                 if len(temp_store) >= 3:  # and simplify:
 
                     if (inA != 0 and inC != 0 and inB == 0) or (inA != 0 and inC != 0 and inB != 0 and inC > 1) or (
@@ -159,8 +157,6 @@ def smplify(enter=""):
                         else:  # inA > inB and inA > inC or inA == inB == inC:
                             for eee in b:  # taking everything away in b
                                 temp_store = temp_store.replace(eee, "")
-
-                # end of test subjuet
 
                 out.append(temp_store)
                 temp_store = ""

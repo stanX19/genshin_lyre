@@ -60,7 +60,7 @@ def key_list_to_score_list(key_list:list):
     return score_list
 
 def score_list_to_nightly(score_list:list, name="Undefined"):
-    all_time = [i for i in score_list if type(i) == float]
+    all_time = [i for i in score_list if type(i) == float and i > 0]
     try:
         average_time = statistics.mode(all_time)  # mode
     except statistics.StatisticsError:  # if no mode or 2 mode

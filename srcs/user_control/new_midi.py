@@ -1,42 +1,49 @@
+import itertools
 import os
 import shutil
-
 import Paths
+import utils
 
 try:
     import controller
     import test_session
     from ...classes import *
     from ...utils import *
+    from .process_video import save_video_as_nightly
 except ImportError:
     import controller
     import test_session
     from classes import *
     from utils import *
+    from process_video import save_video_as_nightly
 
 test_session = test_session.test_session
+
+
+def unique_name_in_all(name):
+    name = name.lower().strip()
+    c = itertools.count()
+
+    if name not in Songs.songs:
+        return name
+    for dir_path, ext in Paths.file_type.items():
+        while os.path.exists(f"{dir_path}/{name}.{ext}"):
+            name = f"{name} ({next(c)})"
+    return name
+
+
 def import_nightly(nightly_path, quiet=False):
     try:
         new_nightly = Nightly(nightly_path)
-        name = nightly_path.replace("/", "\\").split("\\")[-1].replace(".json", "").replace(".genshinsheet","")
+        name = nightly_path.replace("/", "\\").split("\\")[-1].replace(".json", "").replace(".genshinsheet","").lower()
         print(f"File found: '{nightly_path}'")
-        print("  Processing complete, ", end='')
-        print("Saving permanently json file...")
+        print("  Processing complete, Saving permanently as json file...")
 
-        if name in Songs.songs:
-            nightly_name = unique_name(f"{Paths.nightly_path}\\{name}", "json")
-            name = nightly_name.replace("/", "\\").split("\\")[-1].replace(".json", "")
-            # run through txt file for dupes
-            txt_name = unique_name(f"{Paths.score_path}\\{name}", "txt")
-            name = txt_name.replace("/", "\\").split("\\")[-1].replace(".txt", "")
-            # run through mid file for dupes
-            txt_name = unique_name(f"{Paths.mid_path}\\{name}", "mid")
-            name = txt_name.replace("/", "\\").split("\\")[-1].replace(".mid", "")
-            # now name is confirmed to be not a dupe
+        name = unique_name_in_all(name)
         dest_nightly_path = f"{Paths.nightly_path}\\{name}.json"
 
         if quiet or input("Proceed? (Y/n): ").lower() in ["y", "yes"]:
-            shutil.copy2(nightly_path,dest_nightly_path)
+            shutil.copy2(nightly_path, dest_nightly_path)
             print(f"Saved in {Paths.nightly_path}")
         else:
             print("  Cancelled saving")
@@ -47,10 +54,11 @@ def import_nightly(nightly_path, quiet=False):
         print(f"  Error: {exc}")
     return 1
 
+
 def import_midi(midi_path, quiet=False):
     try:
         new_midi = Midi(midi_path)
-        name = midi_path.replace("/", "\\").split("\\")[-1].replace(".mid", "")
+        name = midi_path.replace("/", "\\").split("\\")[-1].replace(".mid", "").lower()
         print(f"File found: '{midi_path}'")
         lowest_sharp, total_key = new_midi.tune_to_c()
         percentage = round(lowest_sharp / total_key * 100, 1)
@@ -63,17 +71,7 @@ def import_midi(midi_path, quiet=False):
             print("no sharps found, midi is tuned to C")
         print("  Saving permanently as midi...")
 
-        if name in Songs.songs:
-            midi_name = unique_name(f"{Paths.mid_path}\\{name}", "mid")
-            name = midi_name.replace("/", "\\").split("\\")[-1].replace(".mid", "")
-            # run through midi file for dupes
-            txt_name = unique_name(f"{Paths.score_path}\\{name}", "txt")
-            name = txt_name.replace("/", "\\").split("\\")[-1].replace(".txt", "")
-            # run through json file for dupes
-            txt_name = unique_name(f"{Paths.nightly_path}\\{name}", "json")
-            name = txt_name.replace("/", "\\").split("\\")[-1].replace(".json", "")
-            # now name is confirmed to be not a dupe
-
+        name = unique_name_in_all(name)
         dest_midi_path = f"{Paths.mid_path}\\{name}.mid"
 
         if quiet or input("Proceed? (Y/n): ").lower() in ["y", "yes"]:
@@ -97,8 +95,12 @@ def midi_or_nightly(path, quiet=False):
         return 0
     if path.endswith(".json"):
         import_nightly(path, quiet)
-    else:
+    elif path.endswith(".mid"):
         import_midi(path, quiet)
+    elif path.endswith(".mp4"):
+        save_video_as_nightly(Paths.nightly_path, [path])
+    elif not quiet:
+        print(f"Invalid file type: {path}; Expected type .json .mid or .mp4")
 
 
 def new_midi():
@@ -108,6 +110,7 @@ def new_midi():
         return 0
     if len(paths) == 1:
         midi_or_nightly(paths[0])
+        controller.song_list.print()
         return
 
     for path in paths:

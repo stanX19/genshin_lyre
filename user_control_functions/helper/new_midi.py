@@ -23,7 +23,7 @@ def new_nightly(nightly_path=""):
         return 0
     try:
         new_nightly = Nightly(nightly_path)
-        name = nightly_path.replace("/", "\\").split("\\")[-1].replace(".genshinsheet.json", "")
+        name = nightly_path.replace("/", "\\").split("\\")[-1].replace(".genshinsheet", "").replace(".json", "")
         print(f"File found: '{nightly_path}'")
         print("  Processing complete, ", end='')
         print("Saving permanently json file...")
@@ -37,7 +37,8 @@ def new_nightly(nightly_path=""):
             # run through mid file for dupes
             txt_name = unique_name(f"{Paths.mid_path}\\{name}", "mid")
             name = txt_name.replace("/", "\\").split("\\")[-1].replace(".mid", "")
-            # now name is confirmed to be not a dupe
+
+        # now name is confirmed to be not a dupe
         dest_nightly_path = f"{Paths.nightly_path}\\{name}.json"
 
         if input("Proceed? (Y/n): ").lower() in ["y", "yes"]:

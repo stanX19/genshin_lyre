@@ -9,7 +9,7 @@
   "midi_include_sharps": true,
   "midi_beat_threshold": 0,
   "midi_offset": 0,
-  "name_max_length": 30,
+  "name_max_length": 25,
   "search_break_weight_ratio": 1.0,
   "search_max_missing": 0
 }

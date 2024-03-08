@@ -1,53 +1,19 @@
-(AG) H /Q W /E WE/W Q /
-W   /E   /      /M   /
-(NG) H /Q T /E TE/W Q /
-Q   /      /       /B   /
-
-(VT) Y /E T /W EW/Q H /
-W   /      /      /      /
-(BSG) H /Q T /E TE/W Q /
-Q   /      /      /      /
-
-(ZG) (BH) /(SQ) (BW) /(DE) WE/W Q /
-(ZW) B /(DE) B /D   /  M /
-(NG) (CH) /(AQ) (CT) /(DE) TE/W Q /
-(NQ) C /(AD)  /(AD)  /      /
-
-(VT) (AY) /(FE) (AT) /(GW) EW/Q H /
-(VW) A /(FG)  /(FG)  /Q   /
-(BG) (XH) /(AQ) (ST) /(DE) TE/W Q /
-(ZQ) B /A S /D H /G Q /
-
-(XBH) B /(BSG) N /(ZW) B /(DGQ)  /
-
-(VH) (NW) /(SW) (DE) /(HW) S /D N /
-V N /S D /(HW) (SE) /(DT) (NE) /
-(CG) (BW) /(SW) (DE) /(GW) S /D B /
-C B /S D /(GW) (SE) /(DT) (BY) /
-
-(XQ) N /S DYT/(GE) (SW) /(DQ) (NQ) /
-(BY) XTE/(SW) (DQ) /(HQ) G /D (SH) /
-(ZE) BDG/(AJ) (BD)GJ/(SW) (BG)JW/(DE) B /
-(ZY) B /A BTE/(SW) (BQ) /(DH) (BG) /
-
-(VH) (NW) /(SW) (DE) /(HW) S /D N /
-V N /S D /(HW) (SE) /(DT) (NE) /
-(CG) (BW) /(SW) (DE) /(GW) S /D B /
-C B /S D /(GW) E /T Y /
-
-(XNW) Q /      /W E /T Y /
-(BSW) EW/Q   /Q   /  H /
-(ZQ) (BS) /(AD) (SG) /(DH) (GQ) /(HW) (QE) /
-(WT)  /      /      /      /
-
-(AG) H /Q W /E WE/W Q /
-(BW) N /(AE) S /D   /S A /
-(NSG) H /(DQ) T /E TE/W Q /
-(BQ) N /A G /D   /S A /
-
-(VAT) Y /E T /W EW/Q H /
-(GW) H /D G /S   /(AQ) N /
-(BSG) H /Q T /E TE/W Q /
-      /(ZQ) B /N A /S D /
-
-G
+(beat0.1)-
+(QV)----J----G----D--G----H--G---------A--------
+(SN)----D--D------------M---------A----------
+(QV)----J----G----D--G----H--G---------A--S------
+Z----D--G------------M---------B----------
+(QV)----J----(GA)----A--G--V--H--G----A----A---------
+(SN)----D--D------------(CB)--------------A--S---
+(VN)--------------D--S--B--------------F--D---
+(NA)------------------------D----G----Q-----
+(WV)----Q--G----Q-------(WB)----E--W---------Q-----
+(WN)----Q--Q----J----J-------D----(GC)----Q--------
+(WV)----Q--G-------Q--W--B----E--W---------Q-----
+(WN)----Q--W----E----Q--N----D----(GB)----Q---------
+(WV)----Q--G--A----E--W--B----Q--G--S----G--Q-------
+(JN)----H--J--D--Q--Q----N---------C----G--H------
+V---------A----E--W--B----Q--J--S----Q--Q------
+N----D----J----Q----T--------------G--H-----
+V--------------E--W--B----Q--J-------H--H----
+N-------------------------------------

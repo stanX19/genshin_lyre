@@ -13,6 +13,10 @@ except ImportError:
     import utils
 
 
+def is_note_on(msg):
+    return hasattr(msg, 'note') and msg.type == "note_on" and msg.velocity != 0
+
+
 class Midi:
     def __init__(self, midi_path: str, name=""):
         if midi_path.endswith(".mid"):
@@ -24,28 +28,6 @@ class Midi:
             self._midi_file = None
         else:
             raise ValueError(f"Expecting midi file type, got '.{midi_path.split('.')[-1]}' file type instead\n")
-
-    def __str__(self):
-        score_list = [val for val in self.to_score_list() if type(val) == float]
-        total_length = sum(score_list)
-        if total_length > 60:
-            song_length = f"{math.floor(total_length / 60)}m {round(total_length % 60)}s"
-        else:
-            song_length = f"{round(total_length)}s"
-        lowest_sharp, total_key = self.tune_to_c()
-        percentage = round(lowest_sharp / total_key * 100, 1)
-        if lowest_sharp > 0:
-            suitability = f"lowest sharp is {lowest_sharp} out of {total_key} keys"
-            if percentage > 0:
-                suitability += f" -{percentage}%-, score may sound weird"
-        else:
-            suitability = "midi is tuned to C"
-        return f"""    STATS FOR {self.name}:
-      TYPE        : Midi file
-      SAVED AS    : {self.name}.mid
-      LENGTH      : {song_length}
-      SUITABILITY : {suitability}
-    """
 
     @property
     def midi_file(self):
@@ -72,6 +54,8 @@ class Midi:
         self.tune_to_c()
         return self.to_score_list()
 
+
+
     @cached_property
     def note_keys(self):
         """notes range finding, minimum sharp will still be high for unsuitable midi"""
@@ -82,7 +66,7 @@ class Midi:
         difference = [2, 2, 1, 2, 2, 2, 1]
 
         # notes range finding
-        midi_notes = sorted([i.note for i in midi if hasattr(i, 'note') and i.type == "note_on"])
+        midi_notes = sorted([i.note for i in midi if is_note_on(i)])
 
         # min and max
         max_midi_note = midi_notes[-1]
@@ -140,7 +124,7 @@ class Midi:
         if self._is_tuned_to_c:
             return self.best_possible, self.track_len
 
-        track = [i.note for i in self.midi_file if hasattr(i, 'note') and i.type == 'note_on']
+        track = [i.note for i in self.midi_file if is_note_on(i)]
         sharps_idx = [1, 3, 6, 8, 10]
 
         all_types = {i: 0 for i in range(12)}
@@ -183,7 +167,7 @@ class Midi:
                 except (TypeError, IndexError):
                     score_list.append(msg.time)
 
-            if 'note' in dir(msg) and msg.type == 'note_on':
+            if is_note_on(msg):
                 stated_note = self.note_keys.get(msg.note, '')
 
                 if type(score_list[-1]) == str:
@@ -255,4 +239,26 @@ class Midi:
             if type(msg) == str:
                 pyautogui.typewrite(msg)
             PlayVaria.song_index += 1
+
+    def __str__(self):
+        score_list = [val for val in self.to_score_list() if type(val) == float]
+        total_length = sum(score_list)
+        if total_length > 60:
+            song_length = f"{math.floor(total_length / 60)}m {round(total_length % 60)}s"
+        else:
+            song_length = f"{round(total_length)}s"
+        lowest_sharp, total_key = self.tune_to_c()
+        percentage = round(lowest_sharp / total_key * 100, 1)
+        if lowest_sharp > 0:
+            suitability = f"lowest sharp is {lowest_sharp} out of {total_key} keys"
+            if percentage > 0:
+                suitability += f" -{percentage}%-, score may sound weird"
+        else:
+            suitability = "midi is tuned to C"
+        return f"""    STATS FOR {self.name}:
+      TYPE        : Midi file
+      SAVED AS    : {self.name}.mid
+      LENGTH      : {song_length}
+      SUITABILITY : {suitability}
+    """
 

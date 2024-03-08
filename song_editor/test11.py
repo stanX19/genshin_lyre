@@ -42,13 +42,13 @@ class TestSettings:
 
 
 def replace_unknown_characters_with_space(input_string):
-    # Define a regular expression pattern to match any character that is not a printable ASCII character
-    pattern = r'[^\x20-\x7E]'
-
-    # Use the sub method to replace all matched characters with spaces
-    cleaned_string = re.sub(pattern, ' ', input_string)
+    # Replace all non printable ascii, excluding \n from the expression
+    cleaned_string = input_string
+    cleaned_string = re.sub(r'\r\n', '\n', cleaned_string)
+    cleaned_string = re.sub(r'[^\x20-\x7E\n]', '|', cleaned_string)
 
     return cleaned_string
+
 
 def read_song_lib():
     try:
@@ -236,7 +236,14 @@ def animuz(test_score):
     print(f"the maximum number of dash, \"-\" is {MAX_DASH}\nat line {dict_score[MAX_DASH]}: {splitted_score[dict_score[MAX_DASH]-1]}")
     DASH_IN_LINE = input("Increase to how many \"-\" per line?: ")
     try:
-        DASH_IN_LINE = int(DASH_IN_LINE)
+        if not DASH_IN_LINE:
+            raise ValueError("Empty input")
+        if DASH_IN_LINE.isnumeric():
+            DASH_IN_LINE = int(DASH_IN_LINE)
+        elif DASH_IN_LINE.count('-') == len(DASH_IN_LINE):
+            DASH_IN_LINE = len(DASH_IN_LINE)
+        else:
+            raise ValueError(f"Input should be numeric, got {DASH_IN_LINE} instead")
         print("Preview:")
         for i,line in enumerate(splitted_score):
             print(splitted_score[i] + max(DASH_IN_LINE - list(line).count("-"), 0)*"-")
