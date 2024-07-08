@@ -127,8 +127,8 @@ Here are some additional instructions and features you can explore with the Gens
 
 ## Technical stuff
 
-It utilizes the `keyboard` and `pyautogui` libraries to simulate keyboard events at an administrator level.
+It utilizes the `keyboard` and `pyautogui` libraries to simulate keyboard events at administrator level.
 
 The script provides a command prompt-like interface for song selection and also includes a simple graphical user interface (GUI) when playing a song.
 
-I know this code is poorly structured, but it works, so......
+The code is poorly structured due to its age and I am still trying to refactor it, sorry in advance

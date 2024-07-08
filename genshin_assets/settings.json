@@ -4,7 +4,7 @@
     1053
   ],
   "pyautoguiFAILSAFE": true,
-  "notification": false,
+  "notification": true,
   "follow_order": true,
   "midi_include_sharps": true,
   "midi_beat_threshold": 0.0,

@@ -1,6 +1,14 @@
-import tkinter as tk
-from multiprocessing import Process, Pipe, parent_process
 import sys
+import tkinter as tk
+from multiprocessing import Process, Pipe, connection
+from typing import Optional
+
+
+# known that we won't run tk as main program
+ROOT: Optional[tk.Tk] = None
+RECEIVER: Optional[connection.Connection] = None
+SENDER: Optional[connection.Connection] = None
+
 
 def round_rectangle(canvas, x1, y1, x2, y2, radius, **kwargs):
     width = x2 - x1
@@ -32,6 +40,7 @@ def round_rectangle(canvas, x1, y1, x2, y2, radius, **kwargs):
     canvas.create_polygon(points, **kwargs, smooth=True)
     return canvas
 
+
 class Dragpad(tk.Canvas):
     def __init__(self, *args, **kwargs):
         tk.Canvas.__init__(self, *args, **kwargs)
@@ -40,6 +49,8 @@ class Dragpad(tk.Canvas):
         self.bind("<ButtonPress-1>", self.start_move, add='+')
         self.bind("<ButtonRelease-1>", self.stop_move, add='+')
         self.bind("<B1-Motion>", self.do_move, add='+')
+        self.x = None
+        self.y = None
 
     def start_move(self, event):
         self.x = event.x
@@ -55,6 +66,7 @@ class Dragpad(tk.Canvas):
         x = self.master.winfo_x() + deltax
         y = self.master.winfo_y() + deltay
         self.master.geometry(f"+{x}+{y}")
+
 
 class FadeAway(tk.Toplevel):
     def __init__(self, *args, **kwargs):
@@ -92,6 +104,7 @@ class FadeAway(tk.Toplevel):
         else:
             self.destroy()
             self.is_dead = True
+
 
 class Notification(FadeAway):
     def __init__(self, text="", fontsize=25, *wargs, **kwargs):
@@ -153,7 +166,7 @@ class Notification(FadeAway):
                               justify="left",
                               anchor="nw",
                               )
-        self.label.place(x=-10,y=-5,)
+        self.label.place(x=-10, y=-5, )
 
 
 def notify_mainloop():
@@ -181,7 +194,7 @@ def notify_mainloop():
         ROOT.update()
 
 
-def tk_notify(text="1\n2\n3",font=15):
+def tk_notify(text="1\n2\n3", font=15):
     if SENDER is None:
         raise Exception("main program is not called by initiating caller, notification wont work without tk mainloop")
     SENDER.send((text, font))
@@ -200,14 +213,9 @@ def initiating_caller(target, args=()):
     ROOT = tk.Tk()
     ROOT.withdraw()
     RECEIVER, SENDER = Pipe(False)
-    process = Process(target=set_up,args=(target,args,RECEIVER,SENDER))
+    process = Process(target=set_up, args=(target, args, RECEIVER, SENDER))
     process.start()
     notify_mainloop()
-
-
-# known that we wont run tk as main program
-ROOT = None
-RECEIVER, SENDER = None, None
 
 
 def main():
