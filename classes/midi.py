@@ -2,6 +2,7 @@ import math
 import time
 from functools import cached_property
 
+import Settings
 import keyboard
 import pyautogui
 from config_data import *
@@ -17,17 +18,60 @@ def is_note_on(msg):
     return hasattr(msg, 'note') and msg.type == "note_on" and msg.velocity != 0
 
 
+LINE_BOT = ['Z', 'X', 'C', 'V', 'B', 'N', 'M']
+LINE_MID = ['A', 'S', 'D', 'F', 'G', 'H', 'J']
+LINE_TOP = ['Q', 'W', 'E', 'R', 'T', 'Y', 'U']
+
+
+def merge_keys(keys: str):
+    return "".join(set(keys))
+
+
+def init_pressed_keys() -> dict[str, int]:
+    return {k: 0 for k in LINE_BOT + LINE_MID + LINE_TOP}
+
+
+def release_pressed_keys(pressed_keys: dict[str, int])->None:
+    for c, n in pressed_keys.items():
+        if not n:
+            continue
+        pyautogui.keyUp(c.lower())
+        pressed_keys[c] = 0
+
+
+class Msg:
+    def __init__(self, delay: float, on_keys: str, off_keys: str):
+        self.time: float = float(delay)
+        self.on_keys: str = on_keys
+        self.off_keys: str = off_keys
+
+    def empty(self):
+        return self.on_keys == "" and self.off_keys == ""
+
+    def merge_with(self, other):
+        if other.time > 0.0:
+            raise ValueError("Other should not have time delay")
+        self.off_keys = merge_keys(self.off_keys + other.off_keys)
+        self.on_keys = merge_keys(self.on_keys + other.on_keys)
+
+    def __str__(self):
+        return f"{self.time:.2f} on={self.on_keys:10} off={self.off_keys:10}"
+
+    def __repr__(self):
+        return self.__str__()
+
+
 class Midi:
     def __init__(self, midi_path: str, name=""):
-        if midi_path.endswith(".mid"):
-            self.path = midi_path
-            self.name = name
-            self.track_len = 0
-            self.best_possible = []
-            self._is_tuned_to_c = False
-            self._midi_file = None
-        else:
-            raise ValueError(f"Expecting midi file type, got '.{midi_path.split('.')[-1]}' file type instead\n")
+        if not midi_path.endswith(".mid"):
+            raise ValueError(f"Expecting midi file type, got '.{midi_path.split('.')[-1]}' file type instead")
+        self.path = midi_path
+        self.name = name
+        self.track_len = 0
+        self.best_possible = []
+        self._is_tuned_to_c = False
+        self._midi_file = None
+        self._score_list: list[Msg] = []
 
     @property
     def midi_file(self):
@@ -46,23 +90,23 @@ class Midi:
 
     @cached_property
     def raw_keys(self):
-        self.tune_to_c()
-        return utils.score_list_to_score(self.to_score_list())
+        return utils.score_list_to_score(self.score_list)
 
     @cached_property
     def score_list(self):
         self.tune_to_c()
-        return self.to_score_list()
-
-
+        self.init_score_list()
+        score_list = []
+        for msg in self._score_list:
+            if msg.on_keys:
+                score_list.append(msg.time)
+                score_list.append(msg.on_keys)
+        return score_list
 
     @cached_property
     def note_keys(self):
         """notes range finding, minimum sharp will still be high for unsuitable midi"""
         midi = self.midi_file
-        LINE1 = ['Z', 'X', 'C', 'V', 'B', 'N', 'M']
-        LINE2 = ['A', 'S', 'D', 'F', 'G', 'H', 'J']
-        LINE3 = ['Q', 'W', 'E', 'R', 'T', 'Y', 'U']
         difference = [2, 2, 1, 2, 2, 2, 1]
 
         # notes range finding
@@ -74,8 +118,9 @@ class Midi:
         lowest_row_start = min_midi_note - min_midi_note % 12
         highest_row_start = max_midi_note - max_midi_note % 12
 
+        # print(lowest_row_start, highest_row_start)
         if highest_row_start - lowest_row_start <= 24:  # small range of data
-            middle_row_start = lowest_row_start + 12
+            middle_row_start = lowest_row_start
         else:
             # quartile
             third_quartile_note = midi_notes[round(len(midi_notes) / 6 * 5)]
@@ -112,10 +157,17 @@ class Midi:
             NOTES.append(index)
             index += i
 
-        # filling in LYRE_KEYS (range), low row and lower + mid-row + high row and higher
+        # filling in LYRE_KEYS (range), loczw row and lower + mid-row + high row and higher
         low_row = int((middle_row_start - lowest_row_start) / 12)
         high_row = int((highest_row_start - middle_row_start) / 12)
-        LYRE_KEYS = LINE1 * low_row + LINE2 + LINE3 * high_row
+        if Settings.rows_count >= 3:
+            LYRE_KEYS = LINE_BOT * low_row + LINE_MID + LINE_TOP * high_row
+        elif Settings.rows_count == 2:
+            LYRE_KEYS = LINE_MID * (low_row + 1) + LINE_TOP * high_row
+        elif Settings.rows_count == 1:
+            LYRE_KEYS = (low_row + high_row + 1) * LINE_TOP
+        else:
+            raise ValueError(f"Expected row count > 0, got {Settings.rows_count} instead")
 
         NOTE_KEY = dict(zip(NOTES, LYRE_KEYS))
         return NOTE_KEY
@@ -157,68 +209,143 @@ class Midi:
         self.midi_file = New_midi
         return self.best_possible, len(track)
 
-    def to_score_list(self):
+    def insert_off_in_score(self, key: str):
+        OFF_THRESHOLD = 0.1
+
+        idx = len(self._score_list) - 1
+        backtracked_time = 0.0
+        while backtracked_time + self._score_list[idx].time < OFF_THRESHOLD \
+                and idx >= 0 and key not in self._score_list[idx].on_keys:
+            backtracked_time += self._score_list[idx].time
+            idx -= 1
+
+        # impossible, if key needs to be turned off it must appear before reaching -1
+        if idx == -1:
+            return
+        # remove existing off
+        for msg in self._score_list[idx:]:
+            if key in msg.off_keys:
+                msg.off_keys = msg.off_keys.replace(key, "")
+
+        # turn off after press
+        if key in self._score_list[idx].on_keys:
+            self._score_list[idx].off_keys += key + "#"
+            return
+        # now idx is the place to insert off msg
+        # base case
+        A = OFF_THRESHOLD - backtracked_time  # remaining time for the note at idx
+        B = self._score_list[idx].time - A  # time for the inserted msg
+        self._score_list[idx].time = A
+        self._score_list.insert(idx, Msg(B, "", key))
+
+    # def clean_score_list(self):
+    #     cleaned = []
+    #     pressed_keys: dict[str, int] = {k: 0 for k in LINE_BOT + LINE_MID + LINE_TOP}
+    #     time_bucket = 0.0
+    #     for msg in self._score_list:
+    #         time_bucket += msg.time
+    #         new_on_keys = ""
+    #         for c in set(msg.on_keys):
+    #             pressed_keys[c] += 1
+    #             if pressed_keys[c] != 1:
+    #                 continue
+    #             new_on_keys += c
+    #         new_off_keys = ""
+    #         for c in set(msg.off_keys):
+    #             pressed_keys[c] -= 1
+    #             if pressed_keys[c] <= 0:
+    #                 new_off_keys += c
+    #         new_msg = Msg(time_bucket, new_on_keys, new_off_keys)
+    #         if new_msg.empty():
+    #             continue
+    #         if new_msg.time == 0.0 and cleaned != []:
+    #             cleaned[-1].merge_with(new_msg)
+    #         else:
+    #             cleaned.append(new_msg)
+    #         time_bucket = 0.0
+    #
+    #     self._score_list = cleaned
+
+    def init_score_list(self):
         midi = self.midi_file
-        score_list = [0.0]
+        self._score_list = [Msg(0.0, "", "")]
+        keys_history = [""]
+        pressed_keys: dict[str, int] = init_pressed_keys()
         for idx, msg in enumerate(midi):
-            if msg.time > 0.0:
-                try:
-                    score_list[-1] += msg.time
-                except (TypeError, IndexError):
-                    score_list.append(msg.time)
+            # add and merge
+            if msg.time > 0.0 and not self._score_list[-1].empty():
+                self._score_list.append(Msg(msg.time, "", ""))
+                if is_note_on(msg):
+                    keys_history.append("")
+            elif msg.time > 0.0:
+                self._score_list[-1].time += msg.time
+            if not hasattr(msg, 'note'):
+                continue
+
+            key = self.note_keys.get(msg.note, '')
+            #  sharp handling
+            if key == '' and Settings.midi_include_sharps:
+                minus1 = self.note_keys[msg.note - 1]
+                key = minus1
+                # if len(keys_history) < 3 or minus1 in keys_history[-1] or minus1 in keys_history[-2]:
+                #     key = self.note_keys[msg.note + 1]
+                # else:
+                #     key = self.note_keys[msg.note - 1]
 
             if is_note_on(msg):
-                stated_note = self.note_keys.get(msg.note, '')
+                pressed_keys[key] += 1
+                if key in self._score_list[-1].off_keys:
+                    self._score_list.append(Msg(0.0, "", ""))
+                    keys_history.append("")
+                if key not in self._score_list[-1].on_keys:
+                    self._score_list[-1].on_keys += key
+                    keys_history[-1] += key
+            else:
+                pressed_keys[key] -= 1
+                if pressed_keys[key] <= 0 and key not in self._score_list[-1].off_keys:
+                    self._score_list[-1].off_keys += key
 
-                if type(score_list[-1]) == str:
-                    #  sharp handling
-                    if stated_note == '' and Settings.midi_include_sharps:
-                        minus1 = self.note_keys[msg.note - 1]
-                        if len(score_list) < 5 or minus1 in score_list[-3] or minus1 in score_list[-5]:
-                            stated_note = self.note_keys[msg.note + 1]
-                        else:
-                            stated_note = self.note_keys[msg.note - 1]
-                    score_list[-1] += stated_note
-                else:  # prev element is float
-                    #  sharp handling
-                    if stated_note == '' and Settings.midi_include_sharps:
-                        minus1 = self.note_keys[msg.note - 1]
-                        if len(score_list) < 4 or minus1 in score_list[-2] or minus1 in score_list[-4]:
-                            stated_note = self.note_keys[msg.note + 1]
-                        else:
-                            stated_note = self.note_keys[msg.note - 1]
-                    score_list.append(stated_note)
+        # for c, i in pressed_keys.items():
+        #     if i:
+        #         print(c, ":", i)
+        # print()
+        temp = self._score_list
+        self._score_list = [Msg(0.0, "", "")]
+        for msg in temp:
+            # adding off before on
+            for c in msg.on_keys:
+                self.insert_off_in_score(c)
+            self._score_list.append(msg)
 
-        while isinstance(score_list[0], float):
-            score_list.pop(0)
-        while isinstance(score_list[-1], float):
-            score_list.pop(-1)
-        return score_list
+        # self.clean_score_list()
+        return self._score_list
 
     def play(self):
         pyautogui.PAUSE = 0
         self.tune_to_c()
 
         # to score
-        score_list = self.to_score_list()
+        _ = self.score_list
         start_time = time.time()
 
+        pressed_keys: dict[str, int] = init_pressed_keys()
         threshold = Settings.midi_beat_threshold
         fixed_time = 0.0
-        while PlayVaria.song_index < len(score_list):
-            msg = score_list[PlayVaria.song_index]
+        while PlayVaria.song_index < len(self._score_list):
+            msg = self._score_list[PlayVaria.song_index]
+            print(msg)
             if keyboard.is_pressed("shift"):
                 break
             if keyboard.is_pressed("left"):
                 while keyboard.is_pressed("left"):
                     pass
+                release_pressed_keys(pressed_keys)
                 PlayVaria.song_index = PlayVaria.song_index - 50 if PlayVaria.song_index > 49 else 0
                 continue
             if keyboard.is_pressed("right"):
                 time.sleep(0.01)
             else:
-                if type(msg) == float:
-                    fixed_time += msg / PlayVaria.speed  # time that should've pass
+                fixed_time += msg.time / PlayVaria.speed  # time that should've pass
                 actual_playback_time = time.time() - start_time
                 duration_to_next_event = fixed_time - actual_playback_time
                 # to cancel out any delay
@@ -236,12 +363,20 @@ class Midi:
                 elif duration_to_next_event < threshold:
                     start_time = time.time() - fixed_time + threshold
 
-            if type(msg) == str:
-                pyautogui.typewrite(msg)
+            for c in msg.on_keys:
+                pyautogui.keyDown(c.lower())
+                pressed_keys[c] = 1
+            for c in msg.off_keys:
+                pyautogui.keyUp(c.lower())
+                pressed_keys[c] = 0
+
             PlayVaria.song_index += 1
 
+        # release all keys before returning
+        release_pressed_keys(pressed_keys)
+
     def __str__(self):
-        score_list = [val for val in self.to_score_list() if type(val) == float]
+        score_list = [val for val in self.score_list if type(val) == float]
         total_length = sum(score_list)
         if total_length > 60:
             song_length = f"{math.floor(total_length / 60)}m {round(total_length % 60)}s"
@@ -262,3 +397,14 @@ class Midi:
       SUITABILITY : {suitability}
     """
 
+
+def main():
+    path = r"C:\Users\DELL\PycharmProjects\pythonProject\genshin_lyre\genshin_lyre\genshin_assets\midi\httyd workplace (6).mid"
+    m = Midi(path)
+    print(m._score_list)
+    keyboard.wait('k')
+    m.play()
+
+
+if __name__ == '__main__':
+    main()

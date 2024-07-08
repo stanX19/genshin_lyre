@@ -14,7 +14,10 @@ def score_list_to_score(score_list):
     except statistics.StatisticsError: #if no mode or 2 mode
         average_time = None
     if not average_time or all_time.count(average_time) < len(all_time)/4:
-        average_time = sorted(all_time)[round(len(all_time) / 2)]  # use median
+        if all_time:
+            average_time = sorted(all_time)[round(len(all_time) / 2)]  # use median
+        else:
+            average_time = 0.01
 
     # edit average dashes here: ↓
     lowest_lim = average_time / 16
@@ -22,9 +25,9 @@ def score_list_to_score(score_list):
 
     score = ""
     for msg in score_list:
-        if type(msg) == float:
+        if isinstance(msg, (float, int)):
             msg = (round(msg / lowest_time)) * "-"
-        elif len(msg) > 1:
+        elif isinstance(msg, str) and len(msg) > 1:
             msg = [key for key in msg if key in all_keys]
             msg = f"({''.join(set(msg))})"
         score += msg

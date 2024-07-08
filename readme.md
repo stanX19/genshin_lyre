@@ -13,12 +13,12 @@ To install and use the Genshin Lyre Project, follow these steps:
 ## getting started
 1) type in the command `set`
 2) type in `1`
-3) follow the instructions and hover your cursor above your **running** genshin app
+3) follow the instructions and hover your cursor above your **running** genshin app icon
 4) press `space` as instructed.
 5) your genshin app loaction has been recorded, now input a song index, e.g. `1`
-6) you will see the screen changing into the genshin game, press `shift`, **then** `k`
-7) the song will start playing, exit play mode using `shift` **then** `i`
-8) go back to the running `genshin_lyre` interface
+6) you will see the screen changing into the genshin game, hold `shift`, **then** press `k`
+7) the song will start playing, to exit play mode, hold `shift`, **then** press `i`
+8) go back to the running `genshin_lyre` command line interface
 9) you can now enter a new command
 10) you can enter `help` to display the list of available commands and their usage.
 
@@ -27,7 +27,7 @@ Here are some additional instructions and features you can explore with the Gens
 
 ##### Basics:
         
-        To enter something means typing something in and press enter at the end
+        To enter something means typing something in the command line terminal and press enter at the end
         (Y/n/q) ------------means yes, no or quit , type in
                             'y' for yes, 'n' or anything else for no and 'q' for quit
         Xxx is missing------you need to include xxx
@@ -131,5 +131,7 @@ It utilizes the `keyboard` and `pyautogui` libraries to simulate keyboard events
 
 The script provides a command prompt-like interface for song selection and also includes a simple graphical user interface (GUI) when playing a song.
 
+#### Disclaimer
 
+I know this code is poorly structured, but it works, so bear with it
 

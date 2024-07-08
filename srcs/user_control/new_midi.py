@@ -89,11 +89,11 @@ def import_midi(midi_path, quiet=False):
         print(f"  Error: {exc}")
 
 
-def midi_or_nightly(path, quiet=False):
+def import_as_format(path, quiet=False):
     if not os.path.exists(path):
         print(f"  Invalid path: {path}")
         return 0
-    if path.endswith(".json"):
+    if path.endswith(".json") or path.endswith(".genshinsheet"):
         import_nightly(path, quiet)
     elif path.endswith(".mid"):
         import_midi(path, quiet)
@@ -109,11 +109,11 @@ def new_midi():
         print("  Cancelled")
         return 0
     if len(paths) == 1:
-        midi_or_nightly(paths[0])
+        import_as_format(paths[0])
         controller.song_list.print()
         return
 
     for path in paths:
-        midi_or_nightly(path, quiet=True)
+        import_as_format(path, quiet=True)
         print()
     return 0

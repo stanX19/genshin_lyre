@@ -22,7 +22,7 @@ def export_as_nightly(song=None,score='',name=''):
         name = song.name
     try:
         jsonfile = score_list_to_nightly(score,name)
-        file_name = f"{name}.json"
+        file_name = f"{name}.genshinsheet.json"
         Paths.export_paths.append(os.path.join(Paths.desktop_path, file_name))
         with open(Paths.export_paths[-1], "w+") as f:
             f.write(jsonfile)

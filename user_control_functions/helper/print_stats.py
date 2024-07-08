@@ -34,7 +34,7 @@ def print_stats(no):
       SAVED AS  : {song_name}.txt
     """)
     elif isinstance(FILE, Midi):
-        score_list = [val for val in FILE.to_score_list() if type(val) == float]
+        score_list = [val for val in FILE.init_score_list() if type(val) == float]
         total_length = sum(score_list)
         if total_length > 60:
             song_length = f"{math.floor(total_length / 60)}m {round(total_length % 60)}s"

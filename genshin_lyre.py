@@ -34,7 +34,6 @@ try:
     from .user_input_control import *
 except ImportError:
     from user_input_control import *
-
 import pyautogui
 
 
@@ -84,5 +83,5 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
-    # run() # for debugging
+    #main()
+    run() # for debugging

@@ -126,7 +126,7 @@ class Nightly:
                 time.sleep(0.01)  # the original delay of pyautogui
             else:
                 if type(msg) == float:
-                    fixed_time += msg / PlayVaria.speed  # time that should've pass
+                    fixed_time += msg  # time that should've pass
                 actual_playback_time = time.time() - start_time
                 duration_to_next_event = fixed_time - actual_playback_time
                 # to cancel out any delay
@@ -147,3 +147,9 @@ class Nightly:
             if type(msg) == str:
                 pyautogui.typewrite(msg)
             PlayVaria.song_index += 1
+
+
+if __name__ == '__main__':
+    p = r"C:\Users\DELL\PycharmProjects\pythonProject\genshin_lyre\genshin_lyre\genshin_assets\nightly\zoltraak - frieren.json"
+    n = Nightly(p)
+    n.play(True)
