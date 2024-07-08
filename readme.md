@@ -4,23 +4,23 @@ The Genshin Lyre Project is a command-line based script that allows users to pla
 ## Installation
 To install and use the Genshin Lyre Project, follow these steps:
 
-1) Clone the repository: `git clone git@github.com:stanX19/genshin_lyre.git`
-2) Install the required dependencies: `pip install -r requirements.txt`
-3) Run the genshin_lyre.py script: `py genshin_lyre.py`
-4) You can now start using the script.
-
+1) Clone the repository: `git clone https://github.com/stanX19/genshin_lyre.git genshin_lyre`
+2) Move into the cloned directory: `cd genshin_lyre`
+2) Initialize submodules: `git submodule update --init --remote --recursive`
+3) Install required dependencies: `py -m pip install -r requirements.txt`
 
 ## getting started
-1) type in the command `set`
-2) type in `1`
-3) follow the instructions and hover your cursor above your **running** genshin app icon
-4) press `space` as instructed.
-5) your genshin app loaction has been recorded, now input a song index, e.g. `1`
-6) you will see the screen changing into the genshin game, hold `shift`, **then** press `k`
-7) the song will start playing, to exit play mode, hold `shift`, **then** press `i`
-8) go back to the running `genshin_lyre` command line interface
-9) you can now enter a new command
-10) you can enter `help` to display the list of available commands and their usage.
+1) Run the script: `py genshin_lyre.py`
+2) type in the command `set`
+3) type in `1`
+4) follow the instructions and hover your cursor above your **running** genshin app icon
+5) press `space` as instructed.
+6) your genshin app loaction has been recorded, now input a song index, e.g. `1`
+7) you will see the screen changing into the genshin game, hold `shift`, **then** press `k`
+8) the song will start playing, to exit play mode, hold `shift`, **then** press `i`
+9) go back to the running `genshin_lyre` command line interface
+10) you can now enter a new command 
+11) you can enter `help` to display the list of available commands and their usage.
 
 ## Usage
 Here are some additional instructions and features you can explore with the Genshin Lyre Project:
@@ -131,7 +131,4 @@ It utilizes the `keyboard` and `pyautogui` libraries to simulate keyboard events
 
 The script provides a command prompt-like interface for song selection and also includes a simple graphical user interface (GUI) when playing a song.
 
-#### Disclaimer
-
-I know this code is poorly structured, but it works, so bear with it
-
+I know this code is poorly structured, but it works, so......
