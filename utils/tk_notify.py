@@ -1,13 +1,9 @@
 import sys
+import threading
 import tkinter as tk
-from multiprocessing import Process, Pipe, connection
-from typing import Optional
-
-
-# known that we won't run tk as main program
-ROOT: Optional[tk.Tk] = None
-RECEIVER: Optional[connection.Connection] = None
-SENDER: Optional[connection.Connection] = None
+from multiprocessing import Process
+from typing import Union, Callable
+import gc
 
 
 def round_rectangle(canvas, x1, y1, x2, y2, radius, **kwargs):
@@ -87,13 +83,19 @@ class FadeAway(tk.Toplevel):
         # fade away
         self.bomb = self.after(2000, self.fade_away)
 
-    def end_countdown(self, event):
+        # hooks
+        self._on_death_func = None
+
+    def on_fadeout(self, func_hook):
+        self._on_death_func = func_hook
+
+    def end_countdown(self, *agrs, **kwargs):
         if self.bomb:
             self.after_cancel(self.bomb)
         self.attributes('-alpha', self.opacity)
 
-    def start_countdown(self, event):
-        self.bomb = self.after(3000, self.fade_away)
+    def start_countdown(self, *agrs, **kwargs):
+        self.bomb = self.after(2000, self.fade_away)
 
     def fade_away(self, speed=0.01):
         alpha = self.attributes("-alpha")
@@ -104,6 +106,8 @@ class FadeAway(tk.Toplevel):
         else:
             self.destroy()
             self.is_dead = True
+            if self._on_death_func is not None:
+                self._on_death_func()
 
 
 class Notification(FadeAway):
@@ -168,63 +172,92 @@ class Notification(FadeAway):
                               )
         self.label.place(x=-10, y=-5, )
 
+    def reinit(self, text, fontsize):
+        # Update the text and font size of the existing label
+        self.label.config(text=text, font=("Courier", fontsize))
 
-def notify_mainloop():
-    if not isinstance(ROOT, tk.Tk):
-        raise Exception("root not initiated")
-    window = None
-    while True:
-        new_args = RECEIVER.recv()
-        if new_args == 0:
-            pass
-        elif new_args is None:
+        # Adjust the size and position of the notification window if necessary
+        line_count = text.count('\n') + 1
+        margin = 20
+        width = 2 * margin + int(self.winfo_screenwidth() / 2)
+        height = int(2 * margin + fontsize * line_count + 0.75 * fontsize * (line_count - 1)) + 10
+        x_cor = int(self.winfo_screenwidth() / 2 - width / 2)
+        y_cor = int(self.winfo_screenheight() - 300 - height)
+
+        self.geometry("{}x{}+{}+{}".format(width, height, x_cor, y_cor))
+        self.background.config(width=width - 50, height=height)
+        self.dragpad.config(height=height)
+        self.label.config(height=height)
+        self.background.delete("all")
+        round_rectangle(self.background, 50, 0, width - 50, height, radius=100, fill="black")
+        self.dragpad.delete("all")
+        round_rectangle(self.dragpad, 0, 0, 50 + 100, height, radius=100, fill="#0d0d0d")
+
+        # reset opacity
+        self.end_countdown()
+        self.start_countdown()
+
+
+class Handler:
+    def __init__(self):
+        self.thread = None
+        self.new_msg = None
+        self.running = False
+        self.window = None
+
+    def start_notif(self, text: str, font: int):
+        self.new_msg = (text, font)
+        if self.running:
             return
-        elif new_args != 0:
-            if window:  # Not first window / there is a existing window
-                window.destroy()
-                extra = RECEIVER.recv()
-                if extra != 0 and extra[0] is None:
-                    return
-            window = Notification(*new_args)
-        if window and window.is_dead:
-            window = None
-        else:
-            SENDER.send(0)
-        ROOT.update_idletasks()
-        ROOT.update()
+        if isinstance(self.thread, threading.Thread):
+            self.thread.join()
+        self.thread = threading.Thread(target=self.main_loop)
+        self.thread.start()
+
+    def on_fadeout(self):
+        self.running = False
+        self.window = None
+
+    def main_loop(self):
+        root = tk.Tk()
+        root.withdraw()
+        self.window = None
+        self.running = True
+        while self.running:
+            root.update()
+            if self.new_msg is None:
+                continue
+            if isinstance(self.window, Notification):
+                self.window.reinit(*self.new_msg)
+            else:
+                self.window = Notification(*self.new_msg)
+                self.window.on_fadeout(self.on_fadeout)
+            self.new_msg = None
+        root.quit()
+        root.destroy()
+        # do not remove the below code, will cause "double free"
+        self.window = None
+        root = None
+        gc.collect()
+
+
+# globals for threads to access
+HANDLER: Handler = Handler()
 
 
 def tk_notify(text="1\n2\n3", font=15):
-    if SENDER is None:
-        raise Exception("main program is not called by initiating caller, notification wont work without tk mainloop")
-    SENDER.send((text, font))
-
-
-def set_up(target, args, receiver, sender):
-    global RECEIVER, SENDER
-    RECEIVER, SENDER = receiver, sender
-    sys.stdin = open(0)
-    target(*args)
-    SENDER.send(None)
-
-
-def initiating_caller(target, args=()):
-    global RECEIVER, SENDER, ROOT
-    ROOT = tk.Tk()
-    ROOT.withdraw()
-    RECEIVER, SENDER = Pipe(False)
-    process = Process(target=set_up, args=(target, args, RECEIVER, SENDER))
-    process.start()
-    notify_mainloop()
+    global HANDLER
+    HANDLER.start_notif(text, font)
 
 
 def main():
     import time
-    tk_notify("hahahahah yessss")
+    tk_notify("some\ntest 1\nstr")
     time.sleep(1)
-    tk_notify("i\nam\nlegend")
-    time.sleep(1)
+    tk_notify("some\ntest 2\nstr")
+    time.sleep(6)
+    tk_notify("some\ntest 3\nstr")
 
 
 if __name__ == '__main__':
-    initiating_caller(main)
+    main()

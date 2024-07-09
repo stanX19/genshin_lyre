@@ -5,9 +5,10 @@ def notify_current_song(song_idx):
     all_songs = list(Songs.songs.keys())
     next_idx = song_idx + 1 if song_idx + 1 != len(all_songs) else 0
     last_idx = song_idx - 1 if song_idx > 0 else len(all_songs) - 1
-    notify(f"({last_idx + 1}) {all_songs[last_idx]}\n\
-({song_idx + 1}) {all_songs[song_idx]}           (currently playing)\n\
-({next_idx + 1}) {all_songs[next_idx]}")
+    notify(f"\
+   ({last_idx + 1}) {all_songs[last_idx]}\n\
+-> ({song_idx + 1}) {all_songs[song_idx]}\n\
+   ({next_idx + 1}) {all_songs[next_idx]}")
 
 def play_song(song_idx):
     print(f"currently playing: {list(Songs.songs.keys())[song_idx]} ({song_idx + 1})")

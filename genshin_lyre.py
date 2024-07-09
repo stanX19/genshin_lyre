@@ -79,7 +79,7 @@ def main():
     if not is_admin():
         run_as_admin(command)
         return
-    initiating_caller(target=safeloop)
+    safeloop()
 
 
 if __name__ == "__main__":
