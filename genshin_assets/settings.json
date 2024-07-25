@@ -3,13 +3,13 @@
     763,
     1053
   ],
-  "pyautoguiFAILSAFE": true,
+  "pyautoguiFAILSAFE": false,
   "notification": true,
   "follow_order": true,
   "midi_include_sharps": true,
   "midi_beat_threshold": 0.0,
-  "midi_offset": -1,
-  "rows_count": 3,
+  "midi_offset": 0,
+  "rows_count": 10,
   "name_max_length": 30,
   "search_break_weight_ratio": 2.0,
   "search_max_missing": 2

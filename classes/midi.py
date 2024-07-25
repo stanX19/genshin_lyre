@@ -28,10 +28,10 @@ def merge_keys(keys: str):
 
 
 def init_pressed_keys() -> dict[str, int]:
-    return {k: 0 for k in LINE_BOT + LINE_MID + LINE_TOP}
+    return {k: 0 for k in LINE_BOT + LINE_MID + LINE_TOP + ['']}
 
 
-def release_pressed_keys(pressed_keys: dict[str, int])->None:
+def release_pressed_keys(pressed_keys: dict[str, int]) -> None:
     for c, n in pressed_keys.items():
         if not n:
             continue
@@ -119,8 +119,10 @@ class Midi:
         highest_row_start = max_midi_note - max_midi_note % 12
 
         # print(lowest_row_start, highest_row_start)
-        if highest_row_start - lowest_row_start <= 24:  # small range of data
+        if highest_row_start - lowest_row_start <= 12:  # small range of data
             middle_row_start = lowest_row_start
+        elif highest_row_start - lowest_row_start <= 24:  # small range of data
+            middle_row_start = lowest_row_start + 12
         else:
             # quartile
             third_quartile_note = midi_notes[round(len(midi_notes) / 6 * 5)]
@@ -157,9 +159,9 @@ class Midi:
             NOTES.append(index)
             index += i
 
-        # filling in LYRE_KEYS (range), loczw row and lower + mid-row + high row and higher
-        low_row = int((middle_row_start - lowest_row_start) / 12)
-        high_row = int((highest_row_start - middle_row_start) / 12)
+        # filling in LYRE_KEYS (range), low row and lower + mid-row + high row and higher
+        low_row = (middle_row_start - lowest_row_start) // 12
+        high_row = (highest_row_start - middle_row_start) // 12
         if Settings.rows_count >= 3:
             LYRE_KEYS = LINE_BOT * low_row + LINE_MID + LINE_TOP * high_row
         elif Settings.rows_count == 2:
@@ -285,12 +287,8 @@ class Midi:
             key = self.note_keys.get(msg.note, '')
             #  sharp handling
             if key == '' and Settings.midi_include_sharps:
-                minus1 = self.note_keys[msg.note - 1]
+                minus1 = self.note_keys.get(msg.note - 1, '')
                 key = minus1
-                # if len(keys_history) < 3 or minus1 in keys_history[-1] or minus1 in keys_history[-2]:
-                #     key = self.note_keys[msg.note + 1]
-                # else:
-                #     key = self.note_keys[msg.note - 1]
 
             if is_note_on(msg):
                 pressed_keys[key] += 1
