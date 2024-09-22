@@ -1,7 +1,7 @@
 genshin_app_coordinate = [955, 1052]
 pyautoguiFAILSAFE = True
 notification = True
-follow_order = True
+sort_mode = 1  # 0: time, 1: order, 2: name
 midi_include_sharps = True
 midi_beat_threshold = 0.0
 midi_offset = 0

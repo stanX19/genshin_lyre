@@ -67,7 +67,7 @@ def safeloop():
         try:
             run()
             break
-        except Exception as exc:
+        except BaseException as exc:
             print_cmd_color("darkYellow", f"\nError due to: {exc}\n")
             time.sleep(1)
             print("restarting program...")
@@ -83,5 +83,5 @@ def main():
 
 
 if __name__ == "__main__":
-    # main()
-    run() # for debugging
+    main()
+    # run() # for debugging

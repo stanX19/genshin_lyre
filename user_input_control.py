@@ -1,3 +1,4 @@
+import Settings
 from srcs import *
 from utils import *
 from classes import *
@@ -16,17 +17,31 @@ except ImportError:
         def macros(cls):
             print("genshin_automation.py is not found")
 
+def safe_input(prompt):
+    ret = ""
+    while not ret:
+        try:
+            pass
+        finally:
+            print(prompt, end="")
+        try:
+            ret = input().lower()
+        except (EOFError, KeyboardInterrupt):
+            try:
+                ...
+            finally:
+                print()
+    return ret
 
+@retry_on_exception(KeyboardInterrupt)
 def user_input_control(enter=''):
-    """execute various function via cmd, mainly playing songs in Songs.songs
-    does not return any value"""
+    """execute various function via cmd, mainly playing songs in Songs.songs"""
     loop = not enter  # no loop if specific command(enter) is given
     while loop:
         if loop:  # always true if no default enter is given
-            enter = input("song name: ").lower()
+            enter = safe_input("song name: ")
         if enter == "":
             continue
-
         no_result = False
         integer_not_used = False
 
@@ -114,20 +129,17 @@ def user_input_control(enter=''):
         elif "clean" in enter:
             controller.export.clean()
         elif "sort" in enter or "by" in enter.split():
+            original_sort = Settings.sort_mode
             if "date" in enter or "time" in enter:
-                if Settings.follow_order:
-                    print("  Song list will now be sorted by date created")
-                    Settings.follow_order = False
-                    controller.song_list.refresh()
-                else:
-                    print("  Song list is already sorted by date created")
+                Settings.sort_mode = 0
             elif "order" in enter:
-                if not Settings.follow_order:
-                    print("  Song list will now follow [order]")
-                    Settings.follow_order = True
-            else:
-                print("  Song list is sorted by{}".format("[order]" if Settings.follow_order else "date created"))
-            controller.settings.save()
+                Settings.sort_mode = 1
+            elif "name" in enter:
+                Settings.sort_mode = 2
+            print("  Song list is now sorted by {}".format(["date created", "[order]", "name"][Settings.sort_mode]))
+            if original_sort != Settings.sort_mode:
+                controller.song_list.refresh()
+                controller.settings.save()
 
         # notification toggling
         elif "notif" == enter or 'notification' in enter or (

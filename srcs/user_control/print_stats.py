@@ -6,7 +6,7 @@ except ImportError:
     from utils import *
 
 def print_stats(no):
-    """No return, print stats of a given song index"""
+    """print stats of a given song index"""
     FILE = list(Songs.songs.values())[no]
     song_name = list(Songs.songs)[no]
 

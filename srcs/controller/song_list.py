@@ -1,3 +1,5 @@
+import Settings
+
 try:
     from ...classes import *
     from ...utils import print_cmd_color
@@ -26,8 +28,6 @@ def read_txt_scores():
             song_name = str(song_path).replace(f".{ext}", "").replace(file_dir + "\\", "").lower()
             all_types[song_name] = str(song_path)
 
-    # sort by time created
-    all_txt = [name for name,path in sorted(all_types.items(), key= lambda f: os.path.getmtime( f[1] ))]
     if not Songs.songs_order:
         PlayVaria.warnings.append(
             "Scores_order.txt is not found, songs will be sorted by name" +
@@ -35,8 +35,14 @@ def read_txt_scores():
 
     # please make sure names in scores_order.txt is exactly same as names used by txt file
     # example 'AOT call of silence' must be named 'AOT call of silence.txt'
-    if Settings.follow_order:
+
+    # sort by time created
+    all_txt = [name for name,path in sorted(all_types.items(), key= lambda f: os.path.getmtime( f[1] ))]
+    # sort by order
+    if Settings.sort_mode == 1:
         all_txt = list(dict.fromkeys(Songs.songs_order + all_txt))  # kill repeated
+    elif Settings.sort_mode == 2:
+        all_txt.sort()  # key=default str alpha sorting
     for txt_file in all_txt:
         if txt_file == "":
             continue

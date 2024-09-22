@@ -96,11 +96,13 @@ class Midi:
     def score_list(self):
         self.tune_to_c()
         self.init_score_list()
-        score_list = []
+        score_list = [0]
         for msg in self._score_list:
             if msg.on_keys:
-                score_list.append(msg.time)
                 score_list.append(msg.on_keys)
+                score_list.append(msg.time)
+            else:
+                score_list[-1] += msg.time
         return score_list
 
     @cached_property
@@ -182,23 +184,26 @@ class Midi:
         sharps_idx = [1, 3, 6, 8, 10]
 
         all_types = {i: 0 for i in range(12)}
+        all_types_weight = {i: 0 for i in range(12)}
         for note in track:
             all_types[note % 12] += 1
+            all_types_weight[note % 12] += note // 12 + 1
 
-        best_possible_major = 0
+        best_possible_major = 0.0
+        min_sharp_weight = float('inf')
         min_sharps = float('inf')
 
         for major_idx in range(12):
+            sharp_weight = sum(all_types_weight[(idx - major_idx) % 12] for idx in sharps_idx)
             sharps = sum(all_types[(idx - major_idx) % 12] for idx in sharps_idx)
 
-            if sharps == 0:
+            if sharp_weight < min_sharp_weight:
                 best_possible_major = major_idx
+                min_sharp_weight = sharp_weight
                 min_sharps = sharps
-                break
 
-            if sharps < min_sharps:
-                best_possible_major = major_idx
-                min_sharps = sharps
+            if sharp_weight == 0:
+                break
 
         offset = best_possible_major
         New_midi = []
@@ -206,7 +211,7 @@ class Midi:
             if 'note' in dir(msg):
                 msg.note += offset
             New_midi.append(msg)
-        self.best_possible = min_sharps
+        self.best_possible = int(min_sharps)
         self.track_len = len(track)
         self.midi_file = New_midi
         return self.best_possible, len(track)
@@ -331,7 +336,7 @@ class Midi:
         fixed_time = 0.0
         while PlayVaria.song_index < len(self._score_list):
             msg = self._score_list[PlayVaria.song_index]
-            print(msg)
+            # print(msg)
             if keyboard.is_pressed("shift"):
                 break
             if keyboard.is_pressed("left"):
@@ -387,7 +392,7 @@ class Midi:
             if percentage > 0:
                 suitability += f" -{percentage}%-, score may sound weird"
         else:
-            suitability = "midi is tuned to C"
+            suitability = f"midi is tuned to C, total {total_key} keys"
         return f"""    STATS FOR {self.name}:
       TYPE        : Midi file
       SAVED AS    : {self.name}.mid

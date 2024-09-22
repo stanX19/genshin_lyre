@@ -79,7 +79,8 @@ class Nightly:
             previous_time = play_time
 
     def __str__(self):
-        total_length = sum([val for val in self.score_list if isinstance(val, float)])
+        all_interval = [val for val in self.score_list if isinstance(val, float)]
+        total_length = sum(all_interval)
         if total_length > 60:
             song_length = f"{math.floor(total_length / 60)}m {round(total_length % 60)}s"
         else:
@@ -88,7 +89,7 @@ class Nightly:
       TYPE        : nightly score
       SAVED AS    : {self.name}.json
       LENGTH      : {song_length}
-      FORMAT      : {"composed" if self.is_composed else "recorded"}
+      FORMAT      : {"composed" if self.is_composed else "recorded"}, total {len(all_interval) + 1} keys"
                 """
 
     @property
