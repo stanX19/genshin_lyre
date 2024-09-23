@@ -1,5 +1,3 @@
-import Settings
-
 try:
     from ...classes import *
     from ...utils import print_cmd_color

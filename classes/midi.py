@@ -2,7 +2,6 @@ import math
 import time
 from functools import cached_property
 
-import Settings
 import keyboard
 import pyautogui
 from config_data import *

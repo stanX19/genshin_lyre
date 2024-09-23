@@ -1,4 +1,3 @@
-import Settings
 from srcs import *
 from utils import *
 from classes import *
