@@ -29,17 +29,15 @@ def play_song(song_idx):
     last_action = time.time()
     while not keyboard.is_pressed('i'):
 
-        if keyboard.is_pressed('k') or PlayVaria.allow_autoplay:
-            PlayVaria.song_index = 0
+        if keyboard.is_pressed('k') or keyboard.is_pressed("[") or PlayVaria.allow_autoplay:
+            if keyboard.is_pressed('k'):
+                PlayVaria.song_index = 0
             if UserVaria.song_loop:
                 PlayVaria.allow_autoplay = True
             Songs.songs[list(Songs.songs.keys())[song_idx]].play()
             last_action = time.time()
-        if keyboard.is_pressed("["):
-            if UserVaria.song_loop:
-                PlayVaria.allow_autoplay = True
-            Songs.songs[list(Songs.songs.keys())[song_idx]].play()
-            last_action = time.time()
+            if Settings.notification:
+                notify_current_song(song_idx)
 
         if keyboard.is_pressed("=") or time.time() >= last_action + 5:
             keyboard.wait("shift")
