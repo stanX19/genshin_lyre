@@ -66,7 +66,7 @@ class Dragpad(tk.Canvas):
 
 class FadeAway(tk.Toplevel):
     def __init__(self, *args, **kwargs):
-        tk.Toplevel.__init__(self, *args, **kwargs)
+        tk.Toplevel.__init__(self)
         self.is_dead = False
 
         # default opacity:

@@ -1,11 +1,11 @@
 {
   "genshin_app_coordinate": [
-    763,
-    1053
+    818,
+    1056
   ],
   "pyautoguiFAILSAFE": false,
   "notification": true,
-  "sort_mode": 0,
+  "sort_mode": 1,
   "midi_include_sharps": true,
   "midi_beat_threshold": 0.0,
   "midi_offset": 0,
