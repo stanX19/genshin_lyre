@@ -153,7 +153,7 @@ if os.path.exists(destination_path) and str(parent_path) != str(destination_path
 
 if str(parent_path) != str(destination_path):
     try:
-        shutil.move(parent_path, destination_path)
+        shutil.copy(parent_path, destination_path)
     except Exception:
         pass
     print("\nSaving genshin_lyre....")
